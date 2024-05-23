@@ -1,0 +1,4 @@
+C:\Users\Bruker\github\MiniCraneMaster\Software\BusanoPrograms\EasyConfigurator_V4_2\EasyConfigurator_V4_2\Projects\OUTPUT_SLAVE\OUTPUT_SLAVE.prj
+C:\Users\Bruker\github\MiniCraneMaster\Software\BusanoPrograms\EasyConfigurator_V4_2\EasyConfigurator_V4_2\Projects\INPUT_SLAVE\INPUT_SLAVE.prj
+C:\Users\Bruker\github\MiniCraneMaster\Software\BusanoPrograms\EasyConfigurator_V4_2\EasyConfigurator_V4_2\Projects\LAB_1\LAB_1.prj
+C:\Users\Bruker\github\MiniCraneMaster\Software\BusanoPrograms\EasyConfigurator_V4_2\EasyConfigurator_V4_2\Projects\MiniCraneEasyIO\MiniCraneEasyIO.prj

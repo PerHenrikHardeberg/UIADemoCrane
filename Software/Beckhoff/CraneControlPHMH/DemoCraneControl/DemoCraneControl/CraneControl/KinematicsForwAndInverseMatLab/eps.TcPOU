@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="eps" Id="{d78e9f1b-a5cb-4869-90dd-763ef8894959}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION eps : LREAL
+VAR_INPUT
+    x: LREAL;
+END_VAR
+VAR
+    absx: LREAL;
+    exponent: DINT;
+    ln2x: LREAL;
+    e: DINT;
+    temp15: LREAL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[absx := ABS(x);
+IF absx < 2.2250738585072014E-307 THEN 
+    eps := 2.2250738585072014E-307;
+ELSE 
+    temp15 := LN(absx);
+    ln2x := rt_floord(u := temp15 / 0.69314718055994529);
+    exponent := TRUNC(ln2x) - 1;
+    e :=  -TRUNC(ln2x);
+    IF ( -TRUNC(ln2x)) < -1022 THEN 
+        absx := absx * 1.90109156629516E-211;
+        e := 700 - TRUNC(ln2x);
+        IF (700 - TRUNC(ln2x)) < -1022 THEN 
+            absx := absx * 1.90109156629516E-211;
+            e := 1400 - TRUNC(ln2x);
+        END_IF;
+    ELSIF ( -TRUNC(ln2x)) > 1023 THEN 
+        absx := absx * 5.2601359015483735E+210;
+        e := ( -TRUNC(ln2x)) - 700;
+        IF (( -TRUNC(ln2x)) - 700) > 1023 THEN 
+            absx := absx * 5.2601359015483735E+210;
+            e := ( -TRUNC(ln2x)) - 1400;
+        END_IF;
+    END_IF;
+    absx := absx * EXPT(2.0, DINT_TO_LREAL(e));
+    IF absx < 0.5 THEN 
+        exponent := TRUNC(ln2x) - 2;
+    ELSIF absx >= 1.0 THEN 
+        exponent := TRUNC(ln2x);
+    END_IF;
+    eps := rt_ldexp_U1d_U2s32_Yd_s_pw(u0 := 1.0, u1 := exponent - 52);
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="xswap_gs" Id="{a4cbe1d0-d15a-4902-860f-7efb389e9d82}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK xswap_gs
+VAR_INPUT
+    ix0: DINT;
+    iy0: DINT;
+END_VAR
+VAR_IN_OUT
+    x: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR_TEMP
+    temp: LREAL;
+    k: DINT;
+    temp_tmp: DINT;
+    tmp: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR k := 0 TO 5 DO 
+    temp_tmp := (ix0 + k) - 1;
+    temp := x[temp_tmp];
+    tmp := (iy0 + k) - 1;
+    x[temp_tmp] := x[tmp];
+    x[tmp] := temp;
+END_FOR;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

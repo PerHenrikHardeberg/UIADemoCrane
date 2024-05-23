@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_Servo" Id="{0122abee-8f8c-45d4-890f-3765ad27e360}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	nServoPulseLenght1		AT %Q* : UINT;
+	nServoPulseLenght2		AT %Q* : UINT;
+	nServoPulseLenght3		AT %Q* : UINT;
+	nServoPulseLenght4		AT %Q* : UINT;
+	nServoPulseLenght5		AT %Q* : UINT;
+	nServoPulseLenght6		AT %Q* : UINT;
+	
+	fNormalizedActuatorVelFeedForward_q1Dot : LREAL;
+	fNormalizedActuatorVelFeedForward_q2Dot : LREAL;
+	fNormalizedActuatorVelFeedForward_q3Dot : LREAL;
+	fNormalizedActuatorVelFeedForward_q4Dot : LREAL;
+	
+	q1_position_error_part : LREAL;
+	q2_position_error_part : LREAL;
+	q3_position_error_part : LREAL;
+	q4_position_error_part : LREAL;
+	
+	f_u_q1 :LREAL;
+	f_u_q2 :LREAL;
+	f_u_q3 :LREAL;
+	f_u_q4 :LREAL; 
+	
+	
+	//Temp for servo test:
+	bStartSinus : BOOL;
+	bSinusActive : BOOL;
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

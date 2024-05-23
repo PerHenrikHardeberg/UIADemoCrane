@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_SetZero" Id="{b5984c7f-7cc4-43af-89e5-5be46ef9365a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_SetZero
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[G_Heave.fThetaStart := G_SensorInput.fYRotDeg;
+G_Toolpoint.fXref := G_Toolpoint.fX; //Set ref to actual
+G_Toolpoint.fYref := G_Toolpoint.fY; //Set ref to actual
+G_Toolpoint.fZref := G_Toolpoint.fZ; //Set ref to actual]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

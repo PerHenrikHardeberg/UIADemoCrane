@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_CartesianVelLimit" Id="{a4066adb-ebd4-4a64-a2e4-483161cf4033}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CartesianVelLimit
+VAR_INPUT
+	axisVelocityIn : LREAL;
+	axisPosition : LREAL;
+	axisMinPosition : LREAL;
+	axisMaxPosition : LREAL;
+END_VAR
+VAR_OUTPUT
+	axisVelocityOut : LREAL;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF axisPosition >= axisMaxPosition THEN
+	//Max reached
+	IF axisVelocityIn >= 0 THEN
+		axisVelocityOut := 0;
+	ELSE
+		axisVelocityOut := axisVelocityIn;
+	END_IF
+ELSIF axisPosition <= axisMinPosition THEN
+	//Min reached
+	IF axisVelocityIn <= 0 THEN
+		axisVelocityOut := 0;
+	ELSE
+		axisVelocityOut := axisVelocityIn;
+	END_IF
+ELSE
+	// None reached
+axisVelocityOut := axisVelocityIn;
+END_IF
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

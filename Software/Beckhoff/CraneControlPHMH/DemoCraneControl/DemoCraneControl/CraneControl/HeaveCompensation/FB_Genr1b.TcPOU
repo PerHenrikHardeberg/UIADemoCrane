@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Genr1b" Id="{604f9623-e57b-46ee-b360-0c110327ef33}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Genr1b
+VAR_INPUT
+    thetaDeg: LREAL;
+    r3x: LREAL; //m
+    r3y: LREAL; //m
+    r3z: LREAL; //m
+END_VAR
+VAR_OUTPUT
+    r1bx: LREAL; //m
+    r1by: LREAL; //m
+    r1bz: LREAL; //m
+END_VAR
+VAR_TEMP
+    theta: LREAL;
+    r1b_crane: ARRAY [0..2] OF LREAL;
+    r1b_crane_tmp: LREAL;
+    r1b_crane_tmp_0: LREAL;
+    r1b_crane_tmp_1: LREAL;
+    r1b_crane_tmp_2: LREAL;
+    r1b_crane_tmp_3: ARRAY [0..8] OF LREAL;
+    r1b_crane_tmp_4: ARRAY [0..2] OF LREAL;
+    i: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* MATLAB Function: '<Root>/MATLAB Function2' *)
+(* Vector from tippingpoint to crane *)
+(* MATLAB Function 'MATLAB Function2': '<S1>:1' *)
+(* '<S1>:1:4' r2a = [-37;0;10]; *)
+(* mm *)
+(* '<S1>:1:6' r3 = [r3x,r3y,r3z]'; *)
+(* '<S1>:1:7' theta = deg2rad(thetaDeg); *)
+theta := 0.017453292519943295 * thetaDeg;
+(* RotationAroundYAxis *)
+(* '<S1>:1:10' Arot = ArotY(theta); *)
+(* Returns the rotation matrix around y axis for given theta input *)
+(* 'ArotY:3' Arot = [ cos(theta) 0 sin(theta); *)
+(* 'ArotY:4'             0        1      0; *)
+(* 'ArotY:5'     -sin(theta)     0   cos(theta)]; *)
+(* '<S1>:1:11' AnegRot = ArotY(-theta); *)
+(* Returns the rotation matrix around y axis for given theta input *)
+(* 'ArotY:3' Arot = [ cos(theta) 0 sin(theta); *)
+(* 'ArotY:4'             0        1      0; *)
+(* 'ArotY:5'     -sin(theta)     0   cos(theta)]; *)
+(* New vectors after rot *)
+(* '<S1>:1:14' r2b = Arot*r2a; *)
+(* r2 new in frame coordinate *)
+(* '<S1>:1:15' r1b = r3-r2b; *)
+(* r1b new in frame coordinate *)
+(* '<S1>:1:16' r1b_crane = AnegRot*r1b; *)
+r1b_crane_tmp := SIN( -theta);
+r1b_crane_tmp_0 := COS( -theta);
+r1b_crane_tmp_1 := SIN(theta);
+r1b_crane_tmp_2 := COS(theta);
+(* MATLAB Function: '<Root>/MATLAB Function2' *)
+r1b_crane_tmp_3[0] := r1b_crane_tmp_2;
+r1b_crane_tmp_3[3] := 0.0;
+r1b_crane_tmp_3[6] := r1b_crane_tmp_1;
+r1b_crane_tmp_3[1] := 0.0;
+r1b_crane_tmp_3[4] := 1.0;
+r1b_crane_tmp_3[7] := 0.0;
+r1b_crane_tmp_3[2] :=  -r1b_crane_tmp_1;
+r1b_crane_tmp_3[5] := 0.0;
+r1b_crane_tmp_3[8] := r1b_crane_tmp_2;
+(* MATLAB Function: '<Root>/MATLAB Function2' *)
+FOR i := 0 TO 2 DO 
+    r1b_crane_tmp_4[i] := (r1b_crane_tmp_3[i + 6] * 0.013) + (r1b_crane_tmp_3[i] * -0.037);
+END_FOR;
+(* MATLAB Function: '<Root>/MATLAB Function2' *)
+r1b_crane_tmp_3[0] := r1b_crane_tmp_0;
+r1b_crane_tmp_3[3] := 0.0;
+r1b_crane_tmp_3[6] := r1b_crane_tmp;
+r1b_crane_tmp_3[2] :=  -r1b_crane_tmp;
+r1b_crane_tmp_3[5] := 0.0;
+r1b_crane_tmp_3[8] := r1b_crane_tmp_0;
+r1b_crane_tmp_3[1] := 0.0;
+r1b_crane_tmp := r3x - r1b_crane_tmp_4[0];
+r1b_crane_tmp_3[4] := 1.0;
+r1b_crane_tmp_0 := r3y - r1b_crane_tmp_4[1];
+r1b_crane_tmp_3[7] := 0.0;
+r1b_crane_tmp_1 := r3z - r1b_crane_tmp_4[2];
+(* MATLAB Function: '<Root>/MATLAB Function2' *)
+FOR i := 0 TO 2 DO 
+    r1b_crane[i] := (r1b_crane_tmp_3[i + 6] * r1b_crane_tmp_1) + ((r1b_crane_tmp_3[i + 3] * r1b_crane_tmp_0) + (r1b_crane_tmp_3[i] * r1b_crane_tmp));
+END_FOR;
+(* Outport: '<Root>/r1bx' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function2' *)
+(* r1b new in crane coordinate *)
+(* '<S1>:1:19' r1bx = r1b_crane(1); *)
+(* '<S1>:1:20' r1by = r1b_crane(2); *)
+(* '<S1>:1:21' r1bz = r1b_crane(3); *)
+r1bx := r1b_crane[0];
+(* Outport: '<Root>/r1by' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function2' *)
+r1by := r1b_crane[1];
+(* Outport: '<Root>/r1bz' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function2' *)
+r1bz := r1b_crane[2];
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

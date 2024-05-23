@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="ButtonControlPulseLenght" Id="{6f16d2f5-3f79-459a-8580-5e898f0ac336}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION ButtonControlPulseLenght : UINT
+VAR_INPUT
+	fJoystickButtonFront : BOOL;
+	fJoystickButtonBack : BOOL;
+	fNeutralPosition : LREAL;
+END_VAR
+VAR
+	fActuation : LREAL;
+	fservoPulseLenght : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF fJoystickButtonFront AND NOT(fJoystickButtonBack) THEN
+	fActuation := -80;
+ELSIF NOT(fJoystickButtonFront) AND fJoystickButtonBack THEN 
+	fActuation := 80;
+ELSE
+	fActuation := 0;
+END_IF
+
+fservoPulseLenght := fActuation + fNeutralPosition;
+ButtonControlPulseLenght := LREAL_TO_UINT(fservoPulseLenght);
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

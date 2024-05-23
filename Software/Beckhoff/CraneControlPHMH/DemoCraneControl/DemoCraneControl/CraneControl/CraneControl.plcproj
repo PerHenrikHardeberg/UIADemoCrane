@@ -1,0 +1,483 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{bce7bcd9-c06b-4f39-875c-35b2fbe32386}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <DownloadApplicationInfo>true</DownloadApplicationInfo>
+    <WriteProductVersion>true</WriteProductVersion>
+    <GenerateTpy>false</GenerateTpy>
+    <Name>CraneControl</Name>
+    <ProgramVersion>3.1.4023.0</ProgramVersion>
+    <Application>{1bc8a67a-5321-41b3-a137-027acfe119b2}</Application>
+    <TypeSystem>{0860ba82-b9d8-4e8f-b903-637dfcbde2fd}</TypeSystem>
+    <Implicit_Task_Info>{750d3c30-5c31-48a8-ae2c-27dccf3a5ce8}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{7853cd08-f35a-45e5-b737-a62783b0469e}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{e475d723-1faa-45dc-8c9e-10684226574e}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{0719d345-34a5-4302-aa8b-135c39177e64}</LibraryReferences>
+    <Released>false</Released>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ActuatorLimits\FB_ActuatorLimits.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ActuatorLimits\FB_CartesianVelLimit.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ActuatorLimits\G_ActuatorLimits.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="ActuatorLimits\P_ActuatorLimits.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ActuatorLimits\P_CartesianLimit.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Class Diagram.TcCD">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\FB_AnalogInputScaling.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\FB_JoystickInputScaling.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\G_Buttons.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\G_ControlBoxInputs.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\G_Joystick.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="ControlBox\G_Outputs.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\G_ScalingParameters.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\P_JoystickInput.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\P_Outputs.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\ST_AnalogInput.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\ST_AnalogInputScaling.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\ST_AnalogInputStatus.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\ST_JoystickInputScaling.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ControlBox\ST_Parameters.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GlobalTextList.TcGTLO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HeaveCompensation\FB_Genr1b.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HeaveCompensation\FB_Get3r.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HeaveCompensation\G_Heave.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="HeaveCompensation\P_Heave.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HeaveCompensation\P_SetZero.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\eps.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\eye.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\FB_ForwardKinematics.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\FB_InverseKinematics.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\isequal.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\MatrixLog3.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\norm.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\pinv.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\pinv_i.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\svd.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\svd_e.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_d.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_dm.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_dmy.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_dmyz.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_dmyzr.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xaxpy_dmyzr5.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xdotc.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xdotc_i.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xnrm2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xnrm2_l.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xrot.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xrotg.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xrot_c.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xrot_c5.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_f.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_fi.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_fiz.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_fiz1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\rt_floord.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\rt_ldexp_U1d_U2s32_Yd_s_pw.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xdotc_iq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xnrm2_l4.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xnrm2_l4b.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_fiz1t.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xscal_fiz1t4.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xswap.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xswap_g.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="KinematicsForwAndInverseMatLab\xswap_gs.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JoystickToCartesianVelocity\FB_JoystickToCartesianVelocity.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Kinematics_CraneFrame\FB_ToolpointPositionIntegrator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Kinematics_CraneFrame\G_InverseKinematics.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="Kinematics_CraneFrame\G_Toolpoint.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="Kinematics_CraneFrame\P_CartesianVelFromJoystick.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Kinematics_CraneFrame\P_Kinematics.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PathGenerator\FB_PathGenerator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PathGenerator\G_Path.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="PathGenerator\P_PathGeneration.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PathGenerator\P_PathGeneration_1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PathGenerator\P_PathGeneration_2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PathGenerator\P_PathGeneration_3.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\P_ModeControl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\P_SlaveInputControl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Visualization.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="Sensors\FB_DistSensorValue2Distance_q4.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\FB_Encoderval2Angle_q3.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Sensors\G_SensorInput.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="Sensors\G_SensorsScaled.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="Sensors\P_SensorScaling.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\FB_PID.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\FB_PID_Controller.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\FB_ActuatorVelFeedForward.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\G_Servo.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="ServoControl\NormToPulseLenght.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\ButtonControlPulseLenght.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_CarteseanControllerServoActuation4DOF.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_ManualActuatorTest.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_NormalizeJointVel.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_CartesianController.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_Idle.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_ManualControl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoControl\P_VelToPos.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Visualization Manager.TcVMO">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ControlBox" />
+    <Folder Include="KinematicsForwAndInverseMatLab" />
+    <Folder Include="Kinematics_CraneFrame" />
+    <Folder Include="JoystickToCartesianVelocity" />
+    <Folder Include="HeaveCompensation" />
+    <Folder Include="ActuatorLimits" />
+    <Folder Include="PathGenerator" />
+    <Folder Include="Sensors" />
+    <Folder Include="ServoControl" />
+    <Folder Include="VISUs" />
+    <Folder Include="POUs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="System_VisuElemMeter">
+      <DefaultResolution>VisuElemMeter, 3.5.13.0 (System)</DefaultResolution>
+      <Namespace>VisuElemMeter</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="System_VisuElems">
+      <DefaultResolution>VisuElems, 3.5.13.40 (System)</DefaultResolution>
+      <Namespace>VisuElems</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="System_VisuElemsSpecialControls">
+      <DefaultResolution>VisuElemsSpecialControls, 3.5.13.0 (System)</DefaultResolution>
+      <Namespace>VisuElemsSpecialControls</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="System_VisuElemsWinControls">
+      <DefaultResolution>VisuElemsWinControls, 3.5.13.20 (System)</DefaultResolution>
+      <Namespace>VisuElemsWinControls</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="System_VisuElemTextEditor">
+      <DefaultResolution>VisuElemTextEditor, 3.5.13.0 (System)</DefaultResolution>
+      <Namespace>VisuElemTextEditor</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="system_visuinputs">
+      <DefaultResolution>visuinputs, 3.5.13.0 (system)</DefaultResolution>
+      <Namespace>visuinputs</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="System_VisuNativeControl">
+      <DefaultResolution>VisuNativeControl, 3.5.13.0 (System)</DefaultResolution>
+      <Namespace>VisuNativeControl</Namespace>
+      <SystemLibrary>true</SystemLibrary>
+      <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_System">
+      <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_System</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Module">
+      <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CraneControl.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <LibraryReference Include="VisuSymbols,3.5.10.0,System">
+      <Namespace>VisuSymbols</Namespace>
+    </LibraryReference>
+  </ItemGroup>
+  <ProjectExtensions>
+    <PlcProjectOptions>
+      <XmlArchive>
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
+      <v n="Name">"&lt;ProjectRoot&gt;"</v>
+      <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
+        <o>
+          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
+        <o>
+          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
+            <v>UnicodeStrings</v>
+            <v>False</v>
+          </d>
+        </o>
+        <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
+        <o>
+          <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
+          <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+            <v>Rules</v>
+            <o>
+              <v n="Name">"Rules"</v>
+              <d n="SubKeys" t="Hashtable" />
+              <d n="Values" t="Hashtable" />
+            </o>
+          </d>
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
+        <o>
+          <v n="Name">"{8F99A816-E488-41E4-9FA3-846536012284}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
+        <o>
+          <v n="Name">"{40450F57-0AA3-4216-96F3-5444ECB29763}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="String">
+            <v>ActiveVisuProfile</v>
+            <v>IR0whWr8bwfwBwAAiD2qpQAAAABVAgAA37x72QAAAAABAAAAAAAAAAEaUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwACTHsAZgA5ADUAYgBiADQAMgA2AC0ANQA1ADIANAAtADQAYgA0ADUALQA5ADQAMAAwAC0AZgBiADAAZgAyAGUANwA3AGUANQAxAGIAfQADCE4AYQBtAGUABDBUAHcAaQBuAEMAQQBUACAAMwAuADEAIABCAHUAaQBsAGQAIAA0ADAAMgA0AC4ANwAFFlAAcgBvAGYAaQBsAGUARABhAHQAYQAGTHsAMQA2AGUANQA1AGIANgAwAC0ANwAwADQAMwAtADQAYQA2ADMALQBiADYANQBiAC0ANgAxADQANwAxADMAOAA3ADgAZAA0ADIAfQAHEkwAaQBiAHIAYQByAGkAZQBzAAhMewAzAGIAZgBkADUANAA1ADkALQBiADAANwBmAC0ANABkADYAZQAtAGEAZQAxAGEALQBhADgAMwAzADUANgBhADUANQAxADQAMgB9AAlMewA5AGMAOQA1ADgAOQA2ADgALQAyAGMAOAA1AC0ANAAxAGIAYgAtADgAOAA3ADEALQA4ADkANQBmAGYAMQBmAGUAZABlADEAYQB9AAoOVgBlAHIAcwBpAG8AbgALBmkAbgB0AAwKVQBzAGEAZwBlAA0KVABpAHQAbABlAA4aVgBpAHMAdQBFAGwAZQBtAE0AZQB0AGUAcgAPDkMAbwBtAHAAYQBuAHkAEAxTAHkAcwB0AGUAbQARElYAaQBzAHUARQBsAGUAbQBzABIwVgBpAHMAdQBFAGwAZQBtAHMAUwBwAGUAYwBpAGEAbABDAG8AbgB0AHIAbwBsAHMAEyhWAGkAcwB1AEUAbABlAG0AcwBXAGkAbgBDAG8AbgB0AHIAbwBsAHMAFCRWAGkAcwB1AEUAbABlAG0AVABlAHgAdABFAGQAaQB0AG8AcgAVIlYAaQBzAHUATgBhAHQAaQB2AGUAQwBvAG4AdAByAG8AbAAWFHYAaQBzAHUAaQBuAHAAdQB0AHMAFwxzAHkAcwB0AGUAbQAYGFYAaQBzAHUARQBsAGUAbQBCAGEAcwBlABkmRABlAHYAUABsAGEAYwBlAGgAbwBsAGQAZQByAHMAVQBzAGUAZAAaCGIAbwBvAGwAGyJQAGwAdQBnAGkAbgBDAG8AbgBzAHQAcgBhAGkAbgB0AHMAHEx7ADQAMwBkADUAMgBiAGMAZQAtADkANAAyAGMALQA0ADQAZAA3AC0AOQBlADkANAAtADEAYgBmAGQAZgAzADEAMABlADYAMwBjAH0AHRxBAHQATABlAGEAcwB0AFYAZQByAHMAaQBvAG4AHhRQAGwAdQBnAGkAbgBHAHUAaQBkAB8WUwB5AHMAdABlAG0ALgBHAHUAaQBkACBIYQBmAGMAZAA1ADQANAA2AC0ANAA5ADEANAAtADQAZgBlADcALQBiAGIANwA4AC0AOQBiAGYAZgBlAGIANwAwAGYAZAAxADcAIRRVAHAAZABhAHQAZQBJAG4AZgBvACJMewBiADAAMwAzADYANgBhADgALQBiADUAYwAwAC0ANABiADkAYQAtAGEAMAAwAGUALQBlAGIAOAA2ADAAMQAxADEAMAA0AGMAMwB9ACMOVQBwAGQAYQB0AGUAcwAkTHsAMQA4ADYAOABmAGYAYwA5AC0AZQA0AGYAYwAtADQANQAzADIALQBhAGMAMAA2AC0AMQBlADMAOQBiAGIANQA1ADcAYgA2ADkAfQAlTHsAYQA1AGIAZAA0ADgAYwAzAC0AMABkADEANwAtADQAMQBiADUALQBiADEANgA0AC0ANQBmAGMANgBhAGQAMgBiADkANgBiADcAfQAmFk8AYgBqAGUAYwB0AHMAVAB5AHAAZQAnVFUAcABkAGEAdABlAEwAYQBuAGcAdQBhAGcAZQBNAG8AZABlAGwARgBvAHIAQwBvAG4AdgBlAHIAdABpAGIAbABlAEwAaQBiAHIAYQByAGkAZQBzACgQTABpAGIAVABpAHQAbABlACkUTABpAGIAQwBvAG0AcABhAG4AeQAqHlUAcABkAGEAdABlAFAAcgBvAHYAaQBkAGUAcgBzACs4UwB5AHMAdABlAG0ALgBDAG8AbABsAGUAYwB0AGkAbwBuAHMALgBIAGEAcwBoAHQAYQBiAGwAZQAsEnYAaQBzAHUAZQBsAGUAbQBzAC1INgBjAGIAMQBjAGQAZQAxAC0AZAA1AGQAYwAtADQAYQAzAGIALQA5ADAANQA0AC0AMgAxAGYAYQA3ADUANgBhADMAZgBhADQALihJAG4AdABlAHIAZgBhAGMAZQBWAGUAcgBzAGkAbwBuAEkAbgBmAG8AL0x7AGMANgAxADEAZQA0ADAAMAAtADcAZgBiADkALQA0AGMAMwA1AC0AYgA5AGEAYwAtADQAZQAzADEANABiADUAOQA5ADYANAAzAH0AMBhNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgAxGE0AaQBuAG8AcgBWAGUAcgBzAGkAbwBuADIMTABlAGcAYQBjAHkAMzBMAGEAbgBnAHUAYQBnAGUATQBvAGQAZQBsAFYAZQByAHMAaQBvAG4ASQBuAGYAbwA0MEwAbwBhAGQATABpAGIAcgBhAHIAaQBlAHMASQBuAHQAbwBQAHIAbwBqAGUAYwB0ADUaQwBvAG0AcABhAHQAaQBiAGkAbABpAHQAeQDQAAIaA9ADAS0E0AUGGgfQBwgaAUUHCQjQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtDtAPAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60BAAAA0A0BLRHQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0S0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAUAAAA0AwLrQIAAADQDQEtE9APAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAAAAAANAMC60CAAAA0A0BLRTQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0V0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtFtAPAS0X0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60EAAAA0A0BLRjQDwEtENAZGq0BRRscAdAAHBoCRR0LBAMAAAAFAAAADQAAAAAAAADQHh8tINAhIhoCRSMkAtAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAAAAANADAS0n0CgBLRHQKQEtENAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAQAAANADAS0n0CgBLRHQKQEtEJoqKwFFAAEC0AABLSzQAAEtF9AAHy0t0C4vGgPQMAutAQAAANAxC60XAAAA0DIarQDQMy8aA9AwC60CAAAA0DELrQMAAADQMhqtANA0Gq0A0DUarQA=</v>
+          </d>
+        </o>
+      </d>
+      <d n="Values" t="Hashtable" />
+    </o>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
+    </PlcProjectOptions>
+  </ProjectExtensions>
+</Project>

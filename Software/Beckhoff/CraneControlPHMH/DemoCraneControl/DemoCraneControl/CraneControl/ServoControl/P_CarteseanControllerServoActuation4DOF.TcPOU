@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_CarteseanControllerServoActuation4DOF" Id="{943e84bf-8c0e-445f-8acd-f2a3a302d293}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_CarteseanControllerServoActuation4DOF
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+IF  G_Joystick.bJoystick2InUse OR G_Joystick.bJoystick3InUse OR G_Joystick.bJoystick4InUse OR G_Path.bPathActivated OR G_Heave.bHeaveActive  THEN
+	
+G_Servo.nServoPulseLenght1 := NormToPulseLenght(fJoyStickNormalized := G_Servo.f_u_q1,
+								fEndPulseLengthPositive := 390, fStartPulseLengthPositive := 368, fStartPulseLengthNegative := 333, fEndPulseLengthNegative := 310);
+
+G_Servo.nServoPulseLenght4 := NormToPulseLenght(fJoyStickNormalized := G_Servo.f_u_q2,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);
+
+// Added minus on normalizsed signal for direction change on servo2, q3
+G_Servo.nServoPulseLenght2 := NormToPulseLenght(fJoyStickNormalized := -G_Servo.f_u_q3,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);
+//Telescope 					
+G_Servo.nServoPulseLenght6 := NormToPulseLenght(fJoyStickNormalized := G_Servo.f_u_q4,
+								fEndPulseLengthPositive := 450, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 330, fEndPulseLengthNegative := 250);
+ELSE
+G_Servo.nServoPulseLenght1 := 350;
+G_Servo.nServoPulseLenght4 := 350;
+G_Servo.nServoPulseLenght2 := 350;
+G_Servo.nServoPulseLenght6 := 340;
+
+END_IF
+
+
+
+							
+// Rotator
+G_Servo.nServoPulseLenght3 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickRightNormalizedX,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 370, fStartPulseLengthNegative := 350, fEndPulseLengthNegative := 290);	
+								
+// Grasper
+G_Servo.nServoPulseLenght5 := ButtonControlPulseLenght(fJoystickButtonFront := G_Buttons.bJoystickRightFrontEnable,
+														fJoystickButtonBack := G_Buttons.bJoystickRightEnable,
+															fNeutralPosition := 325);
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

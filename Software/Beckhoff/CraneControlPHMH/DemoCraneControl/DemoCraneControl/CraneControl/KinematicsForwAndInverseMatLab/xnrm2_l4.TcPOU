@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="xnrm2_l4" Id="{799217c7-b466-46f0-84c7-89450d951f47}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION xnrm2_l4 : LREAL
+VAR_INPUT
+    b_n: DINT;
+    x: ARRAY [0..35] OF LREAL;
+    ix0: DINT;
+END_VAR
+VAR
+    scale: LREAL;
+    kend: DINT;
+    absxk: LREAL;
+    t: LREAL;
+    k: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[xnrm2_l4 := 0.0;
+IF b_n >= 1 THEN 
+    IF b_n = 1 THEN 
+        xnrm2_l4 := ABS(x[ix0 - 1]);
+    ELSE 
+        scale := 3.3121686421112381E-170;
+        kend := (ix0 + b_n) - 1;
+        k := ix0;
+        WHILE k <= kend DO
+            absxk := ABS(x[k - 1]);
+            IF absxk > scale THEN 
+                t := scale / absxk;
+                xnrm2_l4 := ((xnrm2_l4 * t) * t) + 1.0;
+                scale := absxk;
+            ELSE 
+                t := absxk / scale;
+                xnrm2_l4 := (t * t) + xnrm2_l4;
+            END_IF;
+            k := k + 1;
+        END_WHILE;
+        xnrm2_l4 := scale * SQRT(xnrm2_l4);
+    END_IF;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

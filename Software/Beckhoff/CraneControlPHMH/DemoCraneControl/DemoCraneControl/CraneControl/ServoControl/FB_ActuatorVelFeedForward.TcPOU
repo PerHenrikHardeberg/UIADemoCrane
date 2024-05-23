@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ActuatorVelFeedForward" Id="{13d3eedd-83ab-46d3-bf50-6c6566c35bda}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ActuatorVelFeedForward
+VAR_INPUT
+	fActuatorVelocity : LREAL; //Input from inverse velocity kinematics
+	fMaxActuatorVelocity : LREAL; //Actuator velocity at full joystick
+END_VAR
+VAR_OUTPUT
+	fVelocityFeedForward : LREAL;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+fVelocityFeedForward := fActuatorVelocity/fMaxActuatorVelocity;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

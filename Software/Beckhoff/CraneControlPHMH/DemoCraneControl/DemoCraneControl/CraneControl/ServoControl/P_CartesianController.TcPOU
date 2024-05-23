@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_CartesianController" Id="{18e019b9-be55-4700-9db0-8aa7355786cd}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_CartesianController
+VAR
+	fbPIDController : FB_PID_Controller;
+	fbInverseKinematics : FB_InverseKinematics;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+fbInverseKinematics(q1Inn := G_SensorsScaled.q1,// Inverse kinematics
+					q2Inn := G_SensorsScaled.q2,
+					q3Inn := G_SensorsScaled.q3,
+					q4Inn := G_SensorsScaled.q4,
+					r1bx := G_ToolPoint.fXref,    // Possibly change for r1bx???
+					r1by := G_ToolPoint.fYref,
+					r1bz := G_ToolPoint.fZref,
+					Vx := G_InverseKinematics.fvXref,
+					Vy := G_InverseKinematics.fvYref,
+					Vz := G_InverseKinematics.fvZref,
+					q1 => G_InverseKinematics.f_q1_ref,
+					q2 => G_InverseKinematics.f_q2_ref,
+					q3 => G_InverseKinematics.f_q3_ref,
+					q4Dot => G_InverseKinematics.fq4Dotref,
+					success => G_InverseKinematics.bKinematicsSucsessful);
+
+P_NormalizeJointVel(); // Joint vel to normalized for telescope
+
+fbPIDController(); // P controller
+
+P_ActuatorLimits(); // Checking sensors and light lamps in HMI, and preventing automode from chrashing actuators. Called after PID, before actuation
+
+P_CarteseanControllerServoActuation4DOF();	// Servo actuation
+
+
+
+		]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

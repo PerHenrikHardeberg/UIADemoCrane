@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_Outputs" Id="{05725e2c-789e-4faf-9ddc-3f7ec72a2093}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_Outputs
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[///////////////////// Lights //////////////////////////////
+
+
+IF G_Buttons.bManualModeSelector OR G_Buttons.bAutoModeSelector THEN
+	G_Outputs.bGreenButtonLight := FALSE;
+	G_Outputs.bRedButtonLight := TRUE;
+ELSE
+	G_Outputs.bGreenButtonLight := TRUE;
+	G_Outputs.bRedButtonLight := FALSE;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

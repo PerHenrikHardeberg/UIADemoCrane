@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_JoystickInput" Id="{8b676dbd-393f-42d6-8803-330b6e90ab14}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_JoystickInput
+VAR
+	fbJoystickLeftVert 					: FB_JoystickInputScaling;
+	fbJoystickLeftHor 					: FB_JoystickInputScaling;
+	
+	fbJoystickRightVert 				: FB_JoystickInputScaling;
+	fbJoystickRightHor 					: FB_JoystickInputScaling;
+	
+	bEnableJoystick : BOOL;
+		
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[bEnableJoystick := G_Buttons.bManualModeSelector OR G_Buttons.bAutoModeSelector;
+
+fbJoystickLeftVert(
+	bEnable := bEnableJoystick,
+	nRawInput := G_Buttons.stJoyLY.nValue,
+	stJoystickInputScaling := G_ScalingParameters.stParam.stJoystickInputScalingLeftY,
+	fNormalizedOutput => G_Joystick.fJoystickLeftNormalizedY
+);
+
+IF G_Joystick.fJoystickLeftNormalizedY < 0 THEN
+	G_Joystick.nJoystickLeftDirectionY := -1;
+ELSIF G_Joystick.fJoystickLeftNormalizedY > 0 THEN
+	G_Joystick.nJoystickLeftDirectionY := 1;	
+END_IF
+
+fbJoystickLeftHor(
+	bEnable := bEnableJoystick,
+	nRawInput := G_Buttons.stJoyLX.nValue,
+	stJoystickInputScaling := G_ScalingParameters.stParam.stJoystickInputScalingLeftX,
+	fNormalizedOutput => G_Joystick.fJoystickLeftNormalizedX
+);
+
+IF G_Joystick.fJoystickLeftNormalizedX < 0 THEN
+	G_Joystick.nJoystickLeftDirectionX := 1;
+ELSIF G_Joystick.fJoystickLeftNormalizedX > 0 THEN
+	G_Joystick.nJoystickLeftDirectionX := -1;	
+END_IF
+
+
+fbJoystickRightVert(
+	bEnable := bEnableJoystick,
+	nRawInput := G_Buttons.stJoyRY.nValue,
+	stJoystickInputScaling := G_ScalingParameters.stParam.stJoystickInputScalingRightY,
+	fNormalizedOutput => G_Joystick.fJoystickRightNormalizedY
+);
+
+IF G_Joystick.fJoystickRightNormalizedY > 0 THEN
+	G_Joystick.nJoystickRightDirectionY := -1;
+ELSIF G_Joystick.fJoystickRightNormalizedY < 0 THEN
+	G_Joystick.nJoystickRightDirectionY := 1;	
+END_IF
+
+
+
+fbJoystickRightHor(
+	bEnable := bEnableJoystick,
+	nRawInput := G_Buttons.stJoyRX.nValue,
+	stJoystickInputScaling := G_ScalingParameters.stParam.stJoystickInputScalingRightX,
+	fNormalizedOutput => G_Joystick.fJoystickRightNormalizedX
+);
+
+IF G_Joystick.fJoystickRightNormalizedX < 0 THEN
+	G_Joystick.nJoystickRightDirectionX := 1;
+ELSIF G_Joystick.fJoystickRightNormalizedX > 0 THEN
+	G_Joystick.nJoystickRightDirectionX := -1;	
+END_IF
+
+
+// Activate bool for each joystick
+IF G_Joystick.fJoystickRightNormalizedX < 0 OR G_Joystick.fJoystickRightNormalizedX > 0 THEN
+	G_Joystick.bJoystick1InUse := TRUE;
+ELSE
+	G_Joystick.bJoystick1InUse := FALSE;
+END_IF
+
+IF G_Joystick.fJoystickRightNormalizedY < 0 OR G_Joystick.fJoystickRightNormalizedY > 0 THEN
+	G_Joystick.bJoystick2InUse := TRUE;
+ELSE
+	G_Joystick.bJoystick2InUse := FALSE;
+END_IF
+
+IF G_Joystick.fJoystickLeftNormalizedX < 0 OR G_Joystick.fJoystickLeftNormalizedX > 0 THEN
+	G_Joystick.bJoystick3InUse := TRUE;
+ELSE
+	G_Joystick.bJoystick3InUse := FALSE;
+END_IF
+
+IF G_Joystick.fJoystickLeftNormalizedY < 0 OR G_Joystick.fJoystickLeftNormalizedY > 0 THEN
+	G_Joystick.bJoystick4InUse := TRUE;
+ELSE
+	G_Joystick.bJoystick4InUse := FALSE;
+END_IF
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

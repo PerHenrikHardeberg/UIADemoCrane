@@ -1,0 +1,41 @@
+All in mm
+
+CylLong
+Compressed: 94
+Stroke: 60
+Init : 2 because of crashing when total compressed. Same in real model
+
+
+CylShort
+Compressed: 90.3 
+Stroke: 50
+Init: 0
+
+Cyl telescope
+Compressed: 132
+Stroke: 100
+Init: 0 
+
+
+
+Frame beams: 
+400 (width)
+200 (height)
+200 (lenght)
+
+8 mellom
+57.34 fra bak'
+
+3,2 hull
+1,6 hull
+
+magnet 5 x 2
+
+
+Diameter i rør 4.3, går fint å gjenge 5mm
+19 mm mellom rør og magnet
+
+Skinne 5mm hull s spor
+
+
+

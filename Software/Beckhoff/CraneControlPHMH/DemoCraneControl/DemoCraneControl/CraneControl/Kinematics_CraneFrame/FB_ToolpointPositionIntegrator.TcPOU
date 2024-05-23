@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ToolpointPositionIntegrator" Id="{8dc71773-13cd-4b6e-a2ca-ac9e8abeb74c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ToolpointPositionIntegrator
+VAR_INPUT
+	fXref : LREAL;
+	fYref : LREAL;
+	fZref : LREAL;
+END_VAR
+VAR_OUTPUT
+	fXrefOut : LREAL;
+	fYrefOut : LREAL;
+	fZrefOut : LREAL;
+END_VAR
+VAR
+		cycleTime : LREAL :=  0.01; //s
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fXrefOut := fXref;
+
+
+IF G_Path.bStartPath OR G_Joystick.bJoystick2InUse OR G_Joystick.bJoystick4InUse OR G_Joystick.bJoystick3InUse OR G_Heave.bHeaveActive  THEN
+	fXrefOut := fXref;
+	fYrefOut := fYref;
+	fZrefOut := fZref;
+	fXrefOut := fXrefOut + G_InverseKinematics.fvXref * cycleTime;
+	fYrefOut := fYrefOut + G_InverseKinematics.fvYref * cycleTime;
+	fZrefOut := fZrefOut + G_InverseKinematics.fvZref * cycleTime;
+ELSE
+	fXrefOut := G_Toolpoint.fX;
+	fYrefOut := G_Toolpoint.fY;
+	fZrefOut := G_Toolpoint.fZ;
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

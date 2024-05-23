@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.35" ClassName="CNestedPlcProjDef">
+	<DataTypes>
+		<DataType>
+			<Name GUID="{D416A404-C988-AD96-7CED-D32410833B30}" AutoDeleteType="true">ST_AnalogInputStatus</Name>
+			<BitSize>16</BitSize>
+			<SubItem>
+				<Name>Underrange</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.0]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>0</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Overrange</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.1]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>1</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Limit_1_0</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.2]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>2</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Limit_1_1</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.3]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>3</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Limit_2_0</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.4]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>4</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Limit_2_1</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.5]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>5</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Error</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.6]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>6</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_0_7</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 0.7]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>7</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_0</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.0]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>8</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_1</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.1]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>9</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_2</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.2]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>10</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_3</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.3]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>11</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_4</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.4]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>12</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Reserved_1_5</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.5]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>13</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>TxPDO_State</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.6]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>14</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>TxPDO_Toggle</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<Comment><![CDATA[ 1.7	]]></Comment>
+				<BitSize>1</BitSize>
+				<BitOffs>15</BitOffs>
+			</SubItem>
+		</DataType>
+	</DataTypes>
+	<Project GUID="{BCE7BCD9-C06B-4F39-875C-35B2FBE32386}" Name="CraneControl" PrjFilePath="..\..\CraneControl\CraneControl.plcproj" TmcFilePath="..\..\CraneControl\CraneControl.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
+		<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="CraneControl\CraneControl.tmc" TmcHash="{7164BB7D-D81F-84CA-5EC2-E49D9B27FDA7}">
+			<Name>CraneControl Instance</Name>
+			<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+			<Vars VarGrpType="1">
+				<Name>PlcTask Inputs</Name>
+				<Var>
+					<Name>G_Buttons.bManualModeSelector</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bAutoModeSelector</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bJoystickLeftFrontEnable</Name>
+					<Comment><![CDATA[bRedButton					AT %I* : BOOL; Chaned fort extra button on joy stick
+bGreenButton				AT %I* : BOOL; Chaned fort extra button on joy stick]]></Comment>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bJoystickRightFrontEnable</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bJoystickLeftEnable</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bJoystickRightEnable</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.bSafetyRelayRestartButton</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bManualModeSelector</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyLX.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyLX.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyLY.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyLY.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyRX.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyRX.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyRY.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_Buttons.stJoyRY.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bAutoModeSelector</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bRedButton</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bGreenButton</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bJoystickLeftEnable</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bJoystickRightEnable</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.bSafetyRelayRestartButton</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyLX.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyLX.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyLY.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyLY.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyRX.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyRX.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyRY.stStatus</Name>
+					<Type GUID="{D416A404-C988-AD96-7CED-D32410833B30}">ST_AnalogInputStatus</Type>
+				</Var>
+				<Var>
+					<Name>G_ControlBoxInputs.stJoyRY.nValue</Name>
+					<Type>INT</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fEncoder1Rad</Name>
+					<Type>REAL</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fEncoder2Rad</Name>
+					<Type>REAL</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fEncoder3Rad</Name>
+					<Type>REAL</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fTelescopeDistance_mm</Name>
+					<Type>REAL</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fXRotDeg</Name>
+					<Type>REAL</Type>
+				</Var>
+				<Var>
+					<Name>G_SensorInput.fYRotDeg</Name>
+					<Type>REAL</Type>
+				</Var>
+			</Vars>
+			<Vars VarGrpType="2" AreaNo="1">
+				<Name>PlcTask Outputs</Name>
+				<Var>
+					<Name>G_Outputs.bGreenButtonLight</Name>
+					<Comment><![CDATA[ PLC Rack
+ RIO Rack
+ Digital Outputs]]></Comment>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Outputs.bRedButtonLight</Name>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Outputs.bSafetyRelayReset</Name>
+					<Comment><![CDATA[ Analog Outputs
+stWinchValveOutput 		: ST_ValveOutput;
+stCylValveOutput 			: ST_ValveOutput;]]></Comment>
+					<Type>BOOL</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght1</Name>
+					<Type>UINT</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght2</Name>
+					<Type>UINT</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght3</Name>
+					<Type>UINT</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght4</Name>
+					<Type>UINT</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght5</Name>
+					<Type>UINT</Type>
+				</Var>
+				<Var>
+					<Name>G_Servo.nServoPulseLenght6</Name>
+					<Type>UINT</Type>
+				</Var>
+			</Vars>
+			<Contexts>
+				<Context>
+					<Id NeedCalleeCall="true">0</Id>
+					<Name>PlcTask</Name>
+					<ManualConfig>
+						<OTCID>#x02010030</OTCID>
+					</ManualConfig>
+					<Priority>20</Priority>
+					<CycleTime>10000000</CycleTime>
+				</Context>
+			</Contexts>
+			<TaskPouOids>
+				<TaskPouOid Prio="20" OTCID="#x08502001"/>
+			</TaskPouOids>
+		</Instance>
+	</Project>
+	<Mappings>
+		<OwnerA Name="CraneControl Instance">
+			<OwnerB Name="TIID^Device 3 (EtherCAT)^Box 3 (OUTPUT_SLAVE)">
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght1" VarB="Outputs^ServoPulseLength1"/>
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght2" VarB="Outputs^ServoPulseLength2"/>
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght3" VarB="Outputs^ServoPulseLength3"/>
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght4" VarB="Outputs^ServoPulseLength4"/>
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght5" VarB="Outputs^ServoPulseLength5"/>
+				<Link VarA="PlcTask Outputs^G_Servo.nServoPulseLenght6" VarB="Outputs^ServoPulseLength6"/>
+			</OwnerB>
+			<OwnerB Name="TIID^Device 3 (EtherCAT)^Box 4 (INPUT_SLAVE)">
+				<Link VarA="PlcTask Inputs^G_SensorInput.fEncoder1Rad" VarB="Inputs^encoder1Rad"/>
+				<Link VarA="PlcTask Inputs^G_SensorInput.fEncoder2Rad" VarB="Inputs^encoder2Rad"/>
+				<Link VarA="PlcTask Inputs^G_SensorInput.fEncoder3Rad" VarB="Inputs^encoder3Rad"/>
+				<Link VarA="PlcTask Inputs^G_SensorInput.fTelescopeDistance_mm" VarB="Inputs^TelescopeDistance_mm"/>
+				<Link VarA="PlcTask Inputs^G_SensorInput.fXRotDeg" VarB="Inputs^xRotDeg"/>
+				<Link VarA="PlcTask Inputs^G_SensorInput.fYRotDeg" VarB="Inputs^yRotDeg"/>
+			</OwnerB>
+			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1818)">
+				<Link VarA="PlcTask Inputs^G_Buttons.bAutoModeSelector" VarB="Channel 3^Input" Size="1"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.bJoystickLeftEnable" VarB="Channel 7^Input" Size="1"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.bJoystickLeftFrontEnable" VarB="Channel 6^Input" Size="1"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.bJoystickRightEnable" VarB="Channel 8^Input" Size="1"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.bJoystickRightFrontEnable" VarB="Channel 5^Input" Size="1"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.bManualModeSelector" VarB="Channel 4^Input" Size="1"/>
+				<Link VarA="PlcTask Outputs^G_Outputs.bGreenButtonLight" VarB="Channel 9^Output" Size="1"/>
+				<Link VarA="PlcTask Outputs^G_Outputs.bRedButtonLight" VarB="Channel 10^Output" Size="1"/>
+			</OwnerB>
+			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1818)^Term 2 (EL3255)">
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyLX.nValue" VarB="AI Standard Channel 1^Value"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyLX.stStatus" VarB="AI Standard Channel 1^Status"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyLY.nValue" VarB="AI Standard Channel 2^Value"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyLY.stStatus" VarB="AI Standard Channel 2^Status"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyRX.nValue" VarB="AI Standard Channel 3^Value"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyRX.stStatus" VarB="AI Standard Channel 3^Status"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyRY.nValue" VarB="AI Standard Channel 4^Value"/>
+				<Link VarA="PlcTask Inputs^G_Buttons.stJoyRY.stStatus" VarB="AI Standard Channel 4^Status"/>
+			</OwnerB>
+		</OwnerA>
+	</Mappings>
+</TcSmItem>

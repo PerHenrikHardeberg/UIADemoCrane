@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="norm" Id="{dc82e92b-a941-4922-aa51-ea55e2a80668}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION norm : LREAL
+VAR_INPUT
+    x: ARRAY [0..2] OF LREAL;
+END_VAR
+VAR
+    scale: LREAL;
+    absxk: LREAL;
+    t: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[scale := 3.3121686421112381E-170;
+absxk := ABS(x[0]);
+IF absxk > 3.3121686421112381E-170 THEN 
+    norm := 1.0;
+    scale := absxk;
+ELSE 
+    t := absxk / 3.3121686421112381E-170;
+    norm := t * t;
+END_IF;
+absxk := ABS(x[1]);
+IF absxk > scale THEN 
+    t := scale / absxk;
+    norm := ((norm * t) * t) + 1.0;
+    scale := absxk;
+ELSE 
+    t := absxk / scale;
+    norm := (t * t) + norm;
+END_IF;
+absxk := ABS(x[2]);
+IF absxk > scale THEN 
+    t := scale / absxk;
+    norm := ((norm * t) * t) + 1.0;
+    scale := absxk;
+ELSE 
+    t := absxk / scale;
+    norm := (t * t) + norm;
+END_IF;
+norm := scale * SQRT(norm);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

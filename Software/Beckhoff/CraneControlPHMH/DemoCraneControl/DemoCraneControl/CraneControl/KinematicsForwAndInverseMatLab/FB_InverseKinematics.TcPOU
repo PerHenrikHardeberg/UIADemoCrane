@@ -1,0 +1,2387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_InverseKinematics" Id="{11458d5a-9fef-4286-949b-00bcae51904e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InverseKinematics
+VAR_INPUT
+    q1Inn: LREAL;
+    q2Inn: LREAL;
+    q3Inn: LREAL;
+    q4Inn: LREAL;
+    r1bx: LREAL;
+    r1by: LREAL;
+    r1bz: LREAL;
+    Vx: LREAL;
+    Vy: LREAL;
+    Vz: LREAL;
+END_VAR
+VAR_OUTPUT
+    q1: LREAL;
+    q2: LREAL;
+    q3: LREAL;
+    q4Dot: LREAL;
+    success: BOOL;
+END_VAR
+VAR
+    f: ARRAY [0..5] OF SINT := [0,0,1,0,0,0];
+    g: ARRAY [0..5] OF LREAL := [0.0,1.0,0.0,-0.1569,0.0,-0.02745];
+    h: ARRAY [0..5] OF LREAL := [0.0,1.0,0.0,-0.1569,0.0,0.15197];
+    p_a: ARRAY [0..8] OF SINT := [1,0,0,0,1,0,0,0,1];
+    b_l: ARRAY [0..5] OF SINT := [0,0,0,1,0,0];
+    i0_MatrixLog3: MatrixLog3;
+    i0_eye: eye;
+    i0_pinv: pinv;
+    i0_pinv_i: pinv_i;
+END_VAR
+VAR_TEMP
+    q5Inn: LREAL;
+    S5: ARRAY [0..5] OF LREAL;
+    S6: ARRAY [0..5] OF LREAL;
+    J: ARRAY [0..35] OF LREAL;
+    Slist: ARRAY [0..29] OF LREAL;
+    M: ARRAY [0..15] OF LREAL;
+    T: ARRAY [0..15] OF LREAL;
+    thetalist0: ARRAY [0..4] OF LREAL;
+    Tsb: ARRAY [0..15] OF LREAL;
+    Vs: ARRAY [0..5] OF LREAL;
+    err: BOOL;
+    b_i: DINT;
+    c_i: DINT;
+    theta: LREAL;
+    Js: ARRAY [0..29] OF LREAL;
+    d_i: DINT;
+    e_i: DINT;
+    b_theta: LREAL;
+    se3mat: ARRAY [0..15] OF LREAL;
+    omgtheta: ARRAY [0..2] OF LREAL;
+    omgmat: ARRAY [0..8] OF LREAL;
+    a: ARRAY [0..15] OF LREAL;
+    g_a: LREAL;
+    V: ARRAY [0..5] OF LREAL;
+    b_R: ARRAY [0..8] OF LREAL;
+    b_omgmat: ARRAY [0..8] OF LREAL;
+    l_a: LREAL;
+    d_theta: LREAL;
+    Slist_tmp: ARRAY [0..5] OF SINT;
+    g_theta: LREAL;
+    e_theta: LREAL;
+    h_theta: LREAL;
+    j_theta: LREAL;
+    i: DINT;
+    thetalist0_0: LREAL;
+    se3mat_0: ARRAY [0..2] OF LREAL;
+    a_0: ARRAY [0..15] OF LREAL;
+    tmp: ARRAY [0..8] OF LREAL;
+    Tsb_0: ARRAY [0..35] OF LREAL;
+    tmp_0: ARRAY [0..8] OF LREAL;
+    tmp_1: ARRAY [0..29] OF LREAL;
+    tmp_2: ARRAY [0..5] OF LREAL;
+    b_T: ARRAY [0..15] OF LREAL;
+    tmp_3: ARRAY [0..8] OF LREAL;
+    tmp_4: ARRAY [0..8] OF LREAL;
+    T_0: ARRAY [0..35] OF LREAL;
+    tmp_5: ARRAY [0..8] OF LREAL;
+    Slist_tmp_0: DINT;
+    a_tmp_tmp: DINT;
+    omgmat_tmp: DINT;
+    x_tmp: LREAL;
+    R_tmp: DINT;
+    c_theta: LREAL;
+    f_theta: LREAL;
+    i_theta: LREAL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* MATLAB Function: '<Root>/MATLAB Function3' *)
+(* SIMPLIYFIED 3 DOF *)
+(* MATLAB Function 'MATLAB Function3': '<S1>:1' *)
+(* '<S1>:1:4' q5Inn = -(q2Inn+q3Inn); *)
+q5Inn :=  -(q2Inn + q3Inn);
+(* ALWAYS HORISONTAL DUMMY JOINT *)
+(* '<S1>:1:5' q6Inn = -q1Inn; *)
+(* ALWAYS PARRALELL TO ORGIN *)
+(* Lenght from assy drawing *)
+(* '<S1>:1:8' l1 = 156.9/1000; *)
+(* m *)
+(* '<S1>:1:9' l2 = 27.45/1000; *)
+(* m *)
+(* '<S1>:1:10' l3 = 179.42/1000; *)
+(* m *)
+(* '<S1>:1:11' l4 = 26.86/1000; *)
+(* m *)
+(* From Telescope drawing (IN assy drawing) *)
+(* l5 = 163.43;  *)
+(* '<S1>:1:17' l5 = 167.25/1000; *)
+(* m Corrected after sensor calibration  *)
+(* '<S1>:1:18' l6 = 1.75/1000; *)
+(* m *)
+(* '<S1>:1:19' W1 = -l2+l3+l5+q4Inn; *)
+(* '<S1>:1:20' W2 = l4; *)
+(* '<S1>:1:21' W3 = l1-l6; *)
+(* Position of each joint *)
+(* '<S1>:1:25' a1 = [0; 0; 0]; *)
+(* '<S1>:1:26' a2 = [-l2; 0; l1]; *)
+(* '<S1>:1:27' a3 = [-l2+l3; 0; l1]; *)
+(* '<S1>:1:28' a5 = [W1; W2; W3]; *)
+(* '<S1>:1:29' a6 = [W1; W2; W3]; *)
+(* Screw axis of ech joint *)
+(* '<S1>:1:32' Sw1 = [0; 0; 1]; *)
+(* '<S1>:1:33' Sw2 = [0; 1; 0]; *)
+(* '<S1>:1:34' Sw3 = [0; 1; 0]; *)
+(* '<S1>:1:35' Sw5 = [0; 1; 0]; *)
+(* '<S1>:1:36' Sw6 = [0; 0; 1]; *)
+(* '<S1>:1:38' Sv1 = cross(a1,Sw1); *)
+(* '<S1>:1:39' Sv2 = cross(a2,Sw2); *)
+(* '<S1>:1:40' Sv3 = cross(a3,Sw3); *)
+(* '<S1>:1:41' Sv5 = cross(a5,Sw5); *)
+(* '<S1>:1:42' Sv6 = cross(a6,Sw6); *)
+(* '<S1>:1:44' S1 = [Sw1;Sv1]; *)
+(* '<S1>:1:45' S2 = [Sw2;Sv2]; *)
+(* '<S1>:1:46' S3 = [Sw3;Sv3]; *)
+(* '<S1>:1:47' S4 = [0;0;0;1;0;0]; *)
+(* '<S1>:1:48' S5 = [Sw5;Sv5]; *)
+S5[3] := -0.15515;
+S5[4] := 0.0;
+S5[5] := q4Inn + 0.31922;
+(* '<S1>:1:49' S6 = [Sw6;Sv6]; *)
+S5[0] := 0.0;
+S6[0] := 0.0;
+S5[1] := 1.0;
+S6[1] := 0.0;
+S5[2] := 0.0;
+S6[2] := 1.0;
+S6[3] := 0.02686;
+S6[4] := 0.0 - (q4Inn + 0.31922);
+S6[5] := 0.0;
+(* '<S1>:1:51' M = [[1 0 0 W1]; *)
+(* '<S1>:1:52'     [0 1 0 W2]; *)
+(* '<S1>:1:53'     [0 0 1 W3]; *)
+(* '<S1>:1:54'     [0 0 0 1];]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+M[0] := 1.0;
+M[4] := 0.0;
+M[8] := 0.0;
+M[12] := q4Inn + 0.31922;
+M[1] := 0.0;
+M[2] := 0.0;
+M[3] := 0.0;
+M[5] := 1.0;
+M[6] := 0.0;
+M[7] := 0.0;
+M[9] := 0.0;
+M[10] := 1.0;
+M[11] := 0.0;
+M[13] := 0.02686;
+M[14] := 0.15515;
+M[15] := 1.0;
+(* '<S1>:1:56' Slist = [S1,S2,S3,S5,S6]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR i := 0 TO 5 DO 
+    Slist_tmp_0 := SINT_TO_DINT(f[i]);
+    Slist[i] := DINT_TO_LREAL(Slist_tmp_0);
+    Slist[i + 6] := g[i];
+    Slist[i + 12] := h[i];
+    Slist[i + 18] := S5[i];
+    Slist[i + 24] := S6[i];
+    Slist_tmp[i] := DINT_TO_SINT(Slist_tmp_0);
+END_FOR;
+(* '<S1>:1:62' TInverseDesired = [[1, 0, 0, X]; [0, 1, 0, Y]; [0, 0, 1, Z]; [0, 0, 0, 1]]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+T[0] := 1.0;
+T[4] := 0.0;
+T[8] := 0.0;
+T[12] := r1bx;
+T[1] := 0.0;
+T[5] := 1.0;
+T[9] := 0.0;
+T[13] := r1by;
+T[2] := 0.0;
+T[6] := 0.0;
+T[10] := 1.0;
+T[14] := r1bz;
+T[3] := 0.0;
+T[7] := 0.0;
+T[11] := 0.0;
+T[15] := 1.0;
+(* '<S1>:1:63' thetalist0 = [q1Inn; q2Inn; q3Inn; q5Inn; q6Inn]; *)
+thetalist0[0] := q1Inn;
+thetalist0[1] := q2Inn;
+thetalist0[2] := q3Inn;
+thetalist0[3] := q5Inn;
+thetalist0[4] :=  -q1Inn;
+(* '<S1>:1:64' eomg = 0.00001; *)
+(* '<S1>:1:65' ev = 0.0000001; *)
+(* '<S1>:1:66' [thetalist, success] = IKinSpace(Slist, M, TInverseDesired, thetalist0, eomg, ev); *)
+(* *** CHAPTER 6: INVERSE KINEMATICS *** *)
+(* Takes Slist: The joint screw axes in the space frame when the manipulator *)
+(* is at the home position, in the format of a matrix with the *)
+(* screw axes as the columns, *)
+(* M: The home configuration of the end-effector, *)
+(* T: The desired end-effector configuration Tsd, *)
+(* thetalist0: An initial guess of joint angles that are close to  *)
+(* satisfying Tsd, *)
+(* eomg: A small positive tolerance on the end-effector orientation  *)
+(* error. The returned joint angles must give an end-effector  *)
+(* orientation error less than eomg, *)
+(* ev: A small positive tolerance on the end-effector linear position  *)
+(* error. The returned joint angles must give an end-effector  *)
+(* position error less than ev. *)
+(* Returns thetalist: Joint angles that achieve T within the specified  *)
+(* tolerances, *)
+(* success: A logical value where TRUE means that the function found *)
+(* a solution and FALSE means that it ran through the set  *)
+(* number of maximum iterations without finding a solution *)
+(* within the tolerances eomg and ev. *)
+(* Uses an iterative Newton-Raphson root-finding method. *)
+(* The maximum number of iterations before the algorithm is terminated has  *)
+(* been hardcoded in as a variable called maxiterations. It is set to 20 at  *)
+(* the start of the function, but can be changed if needed.   *)
+(* Example Inputs: *)
+(* clear; clc; *)
+(* Slist = [[0; 0;  1;  4; 0;    0], ... *)
+(* [0; 0;  0;  0; 1;    0], ... *)
+(* [0; 0; -1; -6; 0; -0.1]]; *)
+(* M = [[-1, 0, 0, 0]; [0, 1, 0, 6]; [0, 0, -1, 2]; [0, 0, 0, 1]]; *)
+(* T = [[0, 1, 0, -5]; [1, 0, 0, 4]; [0, 0, -1, 1.6858]; [0, 0, 0, 1]]; *)
+(* thetalist0 = [1.5; 2.5; 3]; *)
+(* eomg = 0.01; *)
+(* ev = 0.001; *)
+(* [thetalist, success] = IKinSpace(Slist, M, T, thetalist0, eomg, ev) *)
+(* Output: *)
+(* thetalist = *)
+(* 1.5707 *)
+(* 2.9997 *)
+(* 3.1415 *)
+(* success = *)
+(* 1 *)
+(* 'IKinSpace:48' thetalist = thetalist0; *)
+(* 'IKinSpace:50' i = 0; *)
+i := 0;
+(* 'IKinSpace:51' maxiterations = 50; *)
+(* 'IKinSpace:52' Tsb = FKinSpace(M, Slist, thetalist); *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 15 DO 
+    Tsb[Slist_tmp_0] := M[Slist_tmp_0];
+END_FOR;
+(* *** CHAPTER 4: FORWARD KINEMATICS *** *)
+(* Takes M: the home configuration (position and orientation) of the  *)
+(* end-effector, *)
+(* Slist: The joint screw axes in the space frame when the manipulator *)
+(* is at the home position, *)
+(* thetalist: A list of joint coordinates. *)
+(* Returns T in SE(3) representing the end-effector frame, when the joints  *)
+(* are at the specified coordinates (i.t.o Space Frame). *)
+(* Example Inputs: *)
+(* clear; clc; *)
+(* M = [[-1, 0, 0, 0]; [0, 1, 0, 6]; [0, 0, -1, 2]; [0, 0, 0, 1]]; *)
+(* Slist = [[0; 0;  1;  4; 0;    0], ... *)
+(* [0; 0;  0;  0; 1;    0], ... *)
+(* [0; 0; -1; -6; 0; -0.1]]; *)
+(* thetalist =[pi / 2; 3; pi]; *)
+(* T = FKinSpace(M, Slist, thetalist) *)
+(* Output: *)
+(* T = *)
+(* -0.0000    1.0000         0   -5.0000 *)
+(* 1.0000    0.0000         0    4.0000 *)
+(* 0         0   -1.0000    1.6858 *)
+(* 0         0         0    1.0000 *)
+(* 'FKinSpace:27' T = M; *)
+(* 'FKinSpace:28' for i = size(thetalist,1): -1: 1 *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+se3mat[0] := 0.0;
+se3mat[5] := 0.0;
+se3mat[10] := 0.0;
+se3mat[3] := 0.0;
+se3mat[7] := 0.0;
+se3mat[11] := 0.0;
+se3mat[15] := 0.0;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR c_i := 0 TO 4 DO 
+    (* 'FKinSpace:29' T = MatrixExp6(VecTose3(Slist(:, i) * thetalist(i))) * T; *)
+    thetalist0_0 := thetalist0[4 - c_i];
+    FOR Slist_tmp_0 := 0 TO 5 DO 
+        V[Slist_tmp_0] := Slist[((4 - c_i) * 6) + Slist_tmp_0] * thetalist0_0;
+    END_FOR;
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 6-vector (representing a spatial velocity). *)
+    (* Returns the corresponding 4x4 se(3) matrix. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* V = [1; 2; 3; 4; 5; 6]; *)
+    (* se3mat = VecTose3(V) *)
+    
+    (* Output: *)
+    (* se3mat = *)
+    (* 0    -3     2     4 *)
+    (* 3     0    -1     5 *)
+    (* -2     1     0     6 *)
+    (* 0     0     0     0  *)
+    (* 'VecTose3:18' se3mat = [VecToso3(V(1: 3)), V(4: 6); 0, 0, 0, 0]; *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3-vector (angular velocity). *)
+    (* Returns the skew symmetric matrix in so(3). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* omg = [1; 2; 3]; *)
+    (* so3mat = VecToso3(omg) *)
+    
+    (* Output: *)
+    (* so3mat = *)
+    (* 0    -3     2 *)
+    (* 3     0    -1 *)
+    (* -2     1     0 *)
+    (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+    se3mat[4] :=  -V[2];
+    se3mat[8] := V[1];
+    se3mat[1] := V[2];
+    se3mat[9] :=  -V[0];
+    se3mat[2] :=  -V[1];
+    se3mat[6] := V[0];
+    se3mat[12] := V[3];
+    se3mat[13] := V[4];
+    se3mat[14] := V[5];
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a se(3) representation of exponential coordinates. *)
+    (* Returns a T matrix in SE(3) that is achieved by traveling along/about the  *)
+    (* screw axis S for a distance theta from an initial configuration T = I. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* se3mat = [ 0,      0,       0,      0; *)
+    (* 0,      0, -1.5708, 2.3562; *)
+    (* 0, 1.5708,       0, 2.3562; *)
+    (* 0,      0,       0,      0] *)
+    (* T = MatrixExp6(se3mat) *)
+    
+    (* Output: *)
+    (* T = *)
+    (* 1.0000         0         0         0 *)
+    (* 0    0.0000   -1.0000   -0.0000 *)
+    (* 0    1.0000    0.0000    3.0000 *)
+    (* 0         0         0    1.0000  *)
+    (* 'MatrixExp6:22' omgtheta = so3ToVec(se3mat(1: 3, 1: 3)); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+    (* Returns the corresponding 3-vector (angular velocity). *)
+    (* Example Input:  *)
+    
+    (* clear; clc; *)
+    (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+    (* omg = so3ToVec(so3mat)   *)
+    
+    (* Output: *)
+    (* omg = *)
+    (* 1 *)
+    (* 2 *)
+    (* 3 *)
+    (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+    (* 'MatrixExp6:23' if NearZero(norm(omgtheta)) *)
+    (* *** BASIC HELPER FUNCTIONS *** *)
+    (* Takes a scalar. *)
+    (* Checks if the scalar is small enough to be neglected. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* near = -1e-7; *)
+    (* judge = NearZero(near) *)
+    
+    (* Output: *)
+    (* judge = *)
+    (* 1 *)
+    (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+    se3mat_0[0] := V[0];
+    se3mat_0[1] := V[1];
+    se3mat_0[2] := V[2];
+    d_theta := norm(x := se3mat_0);
+    IF ABS(d_theta) < 1.0E-6 THEN 
+        (* 'MatrixExp6:24' T = [eye(3), se3mat(1: 3, 4); 0, 0, 0, 1]; *)
+        i0_eye();
+        tmp_0 := i0_eye.I;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            a[R_tmp] := tmp_0[3 * Slist_tmp_0];
+            a[R_tmp + 1] := tmp_0[(3 * Slist_tmp_0) + 1];
+            a[R_tmp + 2] := tmp_0[(3 * Slist_tmp_0) + 2];
+            a[Slist_tmp_0 + 12] := se3mat[Slist_tmp_0 + 12];
+        END_FOR;
+        a[3] := 0.0;
+        a[7] := 0.0;
+        a[11] := 0.0;
+        a[15] := 1.0;
+    ELSE 
+        (* 'MatrixExp6:25' else *)
+        (* 'MatrixExp6:26' [omghat, theta] = AxisAng3(omgtheta); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes A 3-vector of exponential coordinates for rotation. *)
+        (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+        (* angle theta. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* expc3 = [1; 2; 3]; *)
+        (* [omghat, theta] = AxisAng3(expc3)   *)
+        
+        (* Output: *)
+        (* omghat = *)
+        (* 0.2673 *)
+        (* 0.5345 *)
+        (* 0.8018 *)
+        (* theta = *)
+        (* 3.7417 *)
+        (* 'AxisAng3:20' theta = norm(expc3); *)
+        (* 'AxisAng3:21' omghat = expc3 / theta; *)
+        (* 'MatrixExp6:27' omgmat = se3mat(1: 3, 1: 3) / theta; *)
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / d_theta;
+            omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / d_theta;
+            omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / d_theta;
+        END_FOR;
+        (* 'MatrixExp6:28' T = [MatrixExp3(se3mat(1: 3, 1: 3)), ... *)
+        (* 'MatrixExp6:29'          (eye(3) * theta + (1 - cos(theta)) * omgmat ... *)
+        (* 'MatrixExp6:30'           + (theta - sin(theta)) * omgmat * omgmat) ... *)
+        (* 'MatrixExp6:31'             * se3mat(1: 3, 4) / theta; *)
+        (* 'MatrixExp6:32'          0, 0, 0, 1]; *)
+        thetalist0_0 := 1.0 - COS(d_theta);
+        g_a := d_theta - SIN(d_theta);
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 so(3) representation of exponential coordinates. *)
+        (* Returns R in SO(3) that is achieved by rotating about omghat by theta  *)
+        (* from an initial orientation R = I. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* R = MatrixExp3(so3mat)   *)
+        
+        (* Output: *)
+        (* R = *)
+        (* -0.6949    0.7135    0.0893 *)
+        (* -0.1920   -0.3038    0.9332 *)
+        (* 0.6930    0.6313    0.3481 *)
+        (* 'MatrixExp3:18' omgtheta = so3ToVec(so3mat); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+        (* Returns the corresponding 3-vector (angular velocity). *)
+        (* Example Input:  *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* omg = so3ToVec(so3mat)   *)
+        
+        (* Output: *)
+        (* omg = *)
+        (* 1 *)
+        (* 2 *)
+        (* 3 *)
+        (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+        (* 'MatrixExp3:19' if NearZero(norm(omgtheta)) *)
+        (* *** BASIC HELPER FUNCTIONS *** *)
+        (* Takes a scalar. *)
+        (* Checks if the scalar is small enough to be neglected. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* near = -1e-7; *)
+        (* judge = NearZero(near) *)
+        
+        (* Output: *)
+        (* judge = *)
+        (* 1 *)
+        (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+        se3mat_0[0] := V[0];
+        se3mat_0[1] := V[1];
+        se3mat_0[2] := V[2];
+        g_theta := norm(x := se3mat_0);
+        IF ABS(g_theta) < 1.0E-6 THEN 
+            (* 'MatrixExp3:20' R = eye(3); *)
+            i0_eye();
+            b_R := i0_eye.I;
+        ELSE 
+            (* 'MatrixExp3:21' else *)
+            (* 'MatrixExp3:22' [omghat, theta] = AxisAng3(omgtheta); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes A 3-vector of exponential coordinates for rotation. *)
+            (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+            (* angle theta. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* expc3 = [1; 2; 3]; *)
+            (* [omghat, theta] = AxisAng3(expc3)   *)
+            
+            (* Output: *)
+            (* omghat = *)
+            (* 0.2673 *)
+            (* 0.5345 *)
+            (* 0.8018 *)
+            (* theta = *)
+            (* 3.7417 *)
+            (* 'AxisAng3:20' theta = norm(expc3); *)
+            (* 'AxisAng3:21' omghat = expc3 / theta; *)
+            (* 'MatrixExp3:23' omgmat = so3mat / theta; *)
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                b_omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / g_theta;
+                b_omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / g_theta;
+                b_omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / g_theta;
+            END_FOR;
+            (* 'MatrixExp3:24' R = eye(3) + sin(theta) * omgmat + (1 - cos(theta)) * omgmat * omgmat; *)
+            l_a := SIN(g_theta);
+            x_tmp := COS(g_theta);
+            i0_eye();
+            tmp_0 := i0_eye.I;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                FOR omgmat_tmp := 0 TO 2 DO 
+                    R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                    b_R[R_tmp] := (((((1.0 - x_tmp) * b_omgmat[Slist_tmp_0 + 3]) * b_omgmat[(3 * omgmat_tmp) + 1]) + (((1.0 - x_tmp) * b_omgmat[Slist_tmp_0]) * b_omgmat[3 * omgmat_tmp])) + ((b_omgmat[Slist_tmp_0 + 6] * (1.0 - x_tmp)) * b_omgmat[(3 * omgmat_tmp) + 2])) + ((b_omgmat[R_tmp] * l_a) + tmp_0[R_tmp]);
+                END_FOR;
+            END_FOR;
+        END_IF;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            l_a := 0.0;
+            FOR omgmat_tmp := 0 TO 2 DO 
+                R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                l_a := ((((((omgmat[Slist_tmp_0 + 3] * g_a) * omgmat[(3 * omgmat_tmp) + 1]) + ((g_a * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * g_a) * omgmat[(3 * omgmat_tmp) + 2])) + ((SINT_TO_LREAL(p_a[R_tmp]) * d_theta) + (omgmat[R_tmp] * thetalist0_0))) * se3mat[omgmat_tmp + 12]) + l_a;
+                a[omgmat_tmp + (Slist_tmp_0 * 4)] := b_R[(3 * Slist_tmp_0) + omgmat_tmp];
+            END_FOR;
+            a[Slist_tmp_0 + 12] := l_a / d_theta;
+        END_FOR;
+        a[3] := 0.0;
+        a[7] := 0.0;
+        a[11] := 0.0;
+        a[15] := 1.0;
+    END_IF;
+    FOR Slist_tmp_0 := 0 TO 3 DO 
+        FOR omgmat_tmp := 0 TO 3 DO 
+            a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+            R_tmp := Slist_tmp_0 + a_tmp_tmp;
+            a_0[R_tmp] := 0.0;
+            a_0[R_tmp] := a_0[R_tmp] + (Tsb[a_tmp_tmp] * a[Slist_tmp_0]);
+            a_0[R_tmp] := (Tsb[a_tmp_tmp + 1] * a[Slist_tmp_0 + 4]) + a_0[R_tmp];
+            a_0[R_tmp] := (Tsb[a_tmp_tmp + 2] * a[Slist_tmp_0 + 8]) + a_0[R_tmp];
+            a_0[R_tmp] := (Tsb[a_tmp_tmp + 3] * a[Slist_tmp_0 + 12]) + a_0[R_tmp];
+        END_FOR;
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 15 DO 
+        Tsb[Slist_tmp_0] := a_0[Slist_tmp_0];
+    END_FOR;
+END_FOR;
+(* 'IKinSpace:53' Vs = Adjoint(Tsb) * se3ToVec(MatrixLog6(TransInv(Tsb) * T)); *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes a transformation matrix T. *)
+(* Returns its inverse.  *)
+(* Uses the structure of transformation matrices to avoid taking a matrix *)
+(* inverse, for efficiency. *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* invT = TransInv(T) *)
+(* Ouput: *)
+(* invT = *)
+(* 1     0     0     0 *)
+(* 0     0     1    -3 *)
+(* 0    -1     0     0 *)
+(* 0     0     0     1 *)
+(* 'TransInv:20' [R, p] = TransToRp(T); *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes the transformation matrix T in SE(3)  *)
+(* Returns R: the corresponding rotation matrix *)
+(* p: the corresponding position vector . *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* [R, p] = TransToRp(T) *)
+(* Output: *)
+(* R = *)
+(* 1     0     0 *)
+(* 0     0    -1 *)
+(* 0     1     0 *)
+(* p = *)
+(* 0 *)
+(* 0 *)
+(* 3 *)
+(* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+(* 'TransToRp:23' p = T(1: 3, 4); *)
+(* 'TransInv:21' invT = [transpose(R), -transpose(R) * p; 0, 0, 0, 1]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 2 DO 
+    omgmat[3 * Slist_tmp_0] := Tsb[Slist_tmp_0];
+    omgmat[(3 * Slist_tmp_0) + 1] := Tsb[Slist_tmp_0 + 4];
+    omgmat[(3 * Slist_tmp_0) + 2] := Tsb[Slist_tmp_0 + 8];
+END_FOR;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 8 DO 
+    b_R[Slist_tmp_0] :=  -omgmat[Slist_tmp_0];
+END_FOR;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 2 DO 
+    omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+    se3mat[omgmat_tmp] := omgmat[3 * Slist_tmp_0];
+    se3mat[omgmat_tmp + 1] := omgmat[(3 * Slist_tmp_0) + 1];
+    se3mat[omgmat_tmp + 2] := omgmat[(3 * Slist_tmp_0) + 2];
+    se3mat[Slist_tmp_0 + 12] := (b_R[Slist_tmp_0 + 6] * Tsb[14]) + ((b_R[Slist_tmp_0 + 3] * Tsb[13]) + (b_R[Slist_tmp_0] * Tsb[12]));
+END_FOR;
+se3mat[3] := 0.0;
+se3mat[7] := 0.0;
+se3mat[11] := 0.0;
+se3mat[15] := 1.0;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 3 DO 
+    FOR omgmat_tmp := 0 TO 3 DO 
+        a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        R_tmp := omgmat_tmp + a_tmp_tmp;
+        a_0[R_tmp] := 0.0;
+        a_0[R_tmp] := a_0[R_tmp] + (T[a_tmp_tmp] * se3mat[omgmat_tmp]);
+        a_0[R_tmp] := (T[a_tmp_tmp + 1] * se3mat[omgmat_tmp + 4]) + a_0[R_tmp];
+        a_0[R_tmp] := (T[a_tmp_tmp + 2] * se3mat[omgmat_tmp + 8]) + a_0[R_tmp];
+        a_0[R_tmp] := (T[a_tmp_tmp + 3] * se3mat[omgmat_tmp + 12]) + a_0[R_tmp];
+    END_FOR;
+END_FOR;
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes a transformation matrix T in SE(3). *)
+(* Returns the corresponding se(3) representation of exponential  *)
+(* coordinates. *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* expmat = MatrixLog6(T) *)
+(* Output: *)
+(* expc6 = *)
+(* 0         0         0         0 *)
+(* 0         0   -1.5708    2.3562 *)
+(* 0    1.5708         0    2.3562 *)
+(* 0         0         0         0 *)
+(* 'MatrixLog6:19' [R, p] = TransToRp(T); *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes the transformation matrix T in SE(3)  *)
+(* Returns R: the corresponding rotation matrix *)
+(* p: the corresponding position vector . *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* [R, p] = TransToRp(T) *)
+(* Output: *)
+(* R = *)
+(* 1     0     0 *)
+(* 0     0    -1 *)
+(* 0     1     0 *)
+(* p = *)
+(* 0 *)
+(* 0 *)
+(* 3 *)
+(* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+(* 'TransToRp:23' p = T(1: 3, 4); *)
+(* 'MatrixLog6:20' omgmat = MatrixLog3(R); *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 2 DO 
+    R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+    b_R[3 * Slist_tmp_0] := a_0[R_tmp];
+    b_R[(3 * Slist_tmp_0) + 1] := a_0[R_tmp + 1];
+    b_R[(3 * Slist_tmp_0) + 2] := a_0[R_tmp + 2];
+END_FOR;
+i0_MatrixLog3(b_R := b_R);
+omgmat := i0_MatrixLog3.so3mat;
+(* 'MatrixLog6:21' if isequal(omgmat, zeros(3)) *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 8 DO 
+    tmp_0[Slist_tmp_0] := 0.0;
+END_FOR;
+IF isequal(varargin_1 := omgmat, varargin_2 := tmp_0) THEN 
+    (* 'MatrixLog6:22' expmat = [zeros(3), T(1: 3, 4); 0, 0, 0, 0]; *)
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        se3mat[omgmat_tmp] := 0.0;
+        se3mat[omgmat_tmp + 1] := 0.0;
+        se3mat[omgmat_tmp + 2] := 0.0;
+        se3mat[Slist_tmp_0 + 12] := a_0[Slist_tmp_0 + 12];
+    END_FOR;
+    se3mat[3] := 0.0;
+    se3mat[7] := 0.0;
+    se3mat[11] := 0.0;
+    se3mat[15] := 0.0;
+ELSE 
+    (* 'MatrixLog6:23' else *)
+    (* 'MatrixLog6:24' theta = acos((trace(R) - 1) / 2); *)
+    theta := ACOS((((a_0[0] + a_0[5]) + a_0[10]) - 1.0) / 2.0);
+    (* 'MatrixLog6:25' expmat = [omgmat, (eye(3) - omgmat / 2 ... *)
+    (* 'MatrixLog6:26'                       + (1 / theta - cot(theta / 2) / 2) ... *)
+    (* 'MatrixLog6:27'                         * omgmat * omgmat / theta) * p; *)
+    (* 'MatrixLog6:28'               0, 0, 0, 0]; *)
+    thetalist0_0 := (1.0 / theta) - ((1.0 / TAN(theta / 2.0)) / 2.0);
+    i0_eye();
+    tmp_0 := i0_eye.I;
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        se3mat_0[Slist_tmp_0] := 0.0;
+        FOR omgmat_tmp := 0 TO 2 DO 
+            se3mat[omgmat_tmp + (Slist_tmp_0 * 4)] := omgmat[(3 * Slist_tmp_0) + omgmat_tmp];
+            R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+            se3mat_0[Slist_tmp_0] := (((((((omgmat[Slist_tmp_0 + 3] * thetalist0_0) * omgmat[(3 * omgmat_tmp) + 1]) + ((thetalist0_0 * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * thetalist0_0) * omgmat[(3 * omgmat_tmp) + 2])) / theta) + (tmp_0[R_tmp] - (omgmat[R_tmp] / 2.0))) * a_0[omgmat_tmp + 12]) + se3mat_0[Slist_tmp_0];
+        END_FOR;
+        se3mat[Slist_tmp_0 + 12] := se3mat_0[Slist_tmp_0];
+    END_FOR;
+    se3mat[3] := 0.0;
+    se3mat[7] := 0.0;
+    se3mat[11] := 0.0;
+    se3mat[15] := 0.0;
+END_IF;
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes T a transformation matrix SE3.  *)
+(* Returns the corresponding 6x6 adjoint representation [AdT]. *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* AdT = Adjoint(T) *)
+(* Output: *)
+(* AdT = *)
+(* 1     0     0     0     0     0 *)
+(* 0     0    -1     0     0     0 *)
+(* 0     1     0     0     0     0 *)
+(* 0     0     3     1     0     0 *)
+(* 3     0     0     0     0    -1 *)
+(* 0     0     0     0     1     0 *)
+(* 'Adjoint:20' [R, p] = TransToRp(T); *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes the transformation matrix T in SE(3)  *)
+(* Returns R: the corresponding rotation matrix *)
+(* p: the corresponding position vector . *)
+(* Example Input: *)
+(* clear; clc; *)
+(* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+(* [R, p] = TransToRp(T) *)
+(* Output: *)
+(* R = *)
+(* 1     0     0 *)
+(* 0     0    -1 *)
+(* 0     1     0 *)
+(* p = *)
+(* 0 *)
+(* 0 *)
+(* 3 *)
+(* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+(* 'TransToRp:23' p = T(1: 3, 4); *)
+(* 'Adjoint:21' AdT = [R, zeros(3); VecToso3(p) * R, R]; *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes a 3-vector (angular velocity). *)
+(* Returns the skew symmetric matrix in so(3). *)
+(* Example Input: *)
+(* clear; clc; *)
+(* omg = [1; 2; 3]; *)
+(* so3mat = VecToso3(omg) *)
+(* Output: *)
+(* so3mat = *)
+(* 0    -3     2 *)
+(* 3     0    -1 *)
+(* -2     1     0 *)
+(* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+(* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+(* Takes se3mat a 4x4 se(3) matrix *)
+(* Returns the corresponding 6-vector (representing spatial velocity). *)
+(* Example Input: *)
+(* clear; clc; *)
+(* se3mat = [[0, -3, 2, 4]; [3, 0, -1, 5]; [-2, 1, 0, 6]; [0, 0, 0, 0]]; *)
+(* V = se3ToVec(se3mat) *)
+(* Output: *)
+(* V = *)
+(* 1 *)
+(* 2 *)
+(* 3 *)
+(* 4 *)
+(* 5 *)
+(* 6 *)
+(* 'se3ToVec:20' V = [se3mat(3, 2); se3mat(1, 3); se3mat(2, 1); se3mat(1: 3, 4)]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+tmp_0[0] := 0.0;
+tmp_0[3] :=  -Tsb[14];
+tmp_0[6] := Tsb[13];
+tmp_0[1] := Tsb[14];
+tmp_0[4] := 0.0;
+tmp_0[7] :=  -Tsb[12];
+tmp_0[2] :=  -Tsb[13];
+tmp_0[5] := Tsb[12];
+tmp_0[8] := 0.0;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 2 DO 
+    FOR omgmat_tmp := 0 TO 2 DO 
+        R_tmp := Slist_tmp_0 + (3 * omgmat_tmp);
+        tmp[R_tmp] := 0.0;
+        a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+        tmp[R_tmp] := tmp[R_tmp] + (Tsb[a_tmp_tmp] * tmp_0[Slist_tmp_0]);
+        tmp[R_tmp] := (Tsb[a_tmp_tmp + 1] * tmp_0[Slist_tmp_0 + 3]) + tmp[R_tmp];
+        tmp[R_tmp] := (Tsb[a_tmp_tmp + 2] * tmp_0[Slist_tmp_0 + 6]) + tmp[R_tmp];
+        Tsb_0[omgmat_tmp + (6 * Slist_tmp_0)] := Tsb[(Slist_tmp_0 * 4) + omgmat_tmp];
+        Tsb_0[omgmat_tmp + (6 * (Slist_tmp_0 + 3))] := 0.0;
+    END_FOR;
+END_FOR;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+V[0] := se3mat[6];
+V[1] := se3mat[8];
+V[2] := se3mat[1];
+FOR Slist_tmp_0 := 0 TO 2 DO 
+    Tsb_0[(6 * Slist_tmp_0) + 3] := tmp[3 * Slist_tmp_0];
+    omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+    R_tmp := 6 * (Slist_tmp_0 + 3);
+    Tsb_0[R_tmp + 3] := Tsb[omgmat_tmp];
+    Tsb_0[(6 * Slist_tmp_0) + 4] := tmp[(3 * Slist_tmp_0) + 1];
+    Tsb_0[R_tmp + 4] := Tsb[omgmat_tmp + 1];
+    Tsb_0[(6 * Slist_tmp_0) + 5] := tmp[(3 * Slist_tmp_0) + 2];
+    Tsb_0[R_tmp + 5] := Tsb[omgmat_tmp + 2];
+    V[Slist_tmp_0 + 3] := se3mat[Slist_tmp_0 + 12];
+END_FOR;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 5 DO 
+    Vs[Slist_tmp_0] := 0.0;
+    FOR omgmat_tmp := 0 TO 5 DO 
+        Vs[Slist_tmp_0] := (Tsb_0[(6 * omgmat_tmp) + Slist_tmp_0] * V[omgmat_tmp]) + Vs[Slist_tmp_0];
+    END_FOR;
+END_FOR;
+(* 'IKinSpace:54' err = norm(Vs(1: 3)) > eomg || norm(Vs(4: 6)) > ev; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+se3mat_0[0] := Vs[0];
+se3mat_0[1] := Vs[1];
+se3mat_0[2] := Vs[2];
+IF norm(x := se3mat_0) > 1.0E-5 THEN 
+    err := TRUE;
+ELSE 
+    se3mat_0[0] := Vs[3];
+    se3mat_0[1] := Vs[4];
+    se3mat_0[2] := Vs[5];
+    IF norm(x := se3mat_0) > 1.0E-7 THEN 
+        err := TRUE;
+    ELSE 
+        err := FALSE;
+    END_IF;
+END_IF;
+(* 'IKinSpace:55' while err && i < maxiterations *)
+IF err THEN 
+    tmp_3[0] := 0.0;
+    tmp_3[4] := 0.0;
+    tmp_3[8] := 0.0;
+    tmp_5[0] := 0.0;
+    tmp_5[4] := 0.0;
+    tmp_5[8] := 0.0;
+    FOR Slist_tmp_0 := 0 TO 8 DO 
+        tmp_4[Slist_tmp_0] := 0.0;
+    END_FOR;
+END_IF;
+WHILE err AND (i < 50) DO
+    (* 'IKinSpace:56' thetalist = thetalist + pinv(JacobianSpace(Slist, thetalist)) * Vs; *)
+    (* *** CHAPTER 5: VELOCITY KINEMATICS AND STATICS *** *)
+    (* Takes Slist: The joint screw axes in the space frame when the manipulator *)
+    (* is at the home position, in the format of a matrix with the *)
+    (* screw axes as the columns, *)
+    (* thetalist: A list of joint coordinates.  *)
+    (* Returns the corresponding space Jacobian (6xn real numbers). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* Slist = [[0; 0; 1;   0; 0.2; 0.2], ... *)
+    (* [1; 0; 0;   2;   0;   3], ... *)
+    (* [0; 1; 0;   0;   2;   1], ... *)
+    (* [1; 0; 0; 0.2; 0.3; 0.4]]; *)
+    (* thetalist = [0.2; 1.1; 0.1; 1.2]; *)
+    (* Js = JacobianSpace(Slist, thetalist) *)
+    
+    (* Output: *)
+    (* Js = *)
+    (* 0    0.9801   -0.0901    0.9575 *)
+    (* 0    0.1987    0.4446    0.2849 *)
+    (* 1.0000         0    0.8912   -0.0453 *)
+    (* 0    1.9522   -2.2164   -0.5116 *)
+    (* 0.2000    0.4365   -2.4371    2.7754 *)
+    (* 0.2000    2.9603    3.2357    2.2251 *)
+    (* 'JacobianSpace:27' Js = Slist; *)
+    FOR Slist_tmp_0 := 0 TO 29 DO 
+        Js[Slist_tmp_0] := Slist[Slist_tmp_0];
+    END_FOR;
+    (* 'JacobianSpace:28' T = eye(4); *)
+    FOR Slist_tmp_0 := 0 TO 15 DO 
+        a_0[Slist_tmp_0] := 0.0;
+    END_FOR;
+    a_0[0] := 1.0;
+    a_0[5] := 1.0;
+    a_0[10] := 1.0;
+    a_0[15] := 1.0;
+    (* 'JacobianSpace:29' for i = 2: length(thetalist) *)
+    se3mat[0] := 0.0;
+    se3mat[5] := 0.0;
+    se3mat[10] := 0.0;
+    se3mat[3] := 0.0;
+    se3mat[7] := 0.0;
+    se3mat[11] := 0.0;
+    se3mat[15] := 0.0;
+    FOR d_i := 0 TO 3 DO 
+        (* 'JacobianSpace:30' T = T * MatrixExp6(VecTose3(Slist(:, i - 1) * thetalist(i - 1))); *)
+        thetalist0_0 := thetalist0[d_i];
+        FOR Slist_tmp_0 := 0 TO 5 DO 
+            V[Slist_tmp_0] := Slist[(6 * d_i) + Slist_tmp_0] * thetalist0_0;
+        END_FOR;
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 6-vector (representing a spatial velocity). *)
+        (* Returns the corresponding 4x4 se(3) matrix. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* V = [1; 2; 3; 4; 5; 6]; *)
+        (* se3mat = VecTose3(V) *)
+        
+        (* Output: *)
+        (* se3mat = *)
+        (* 0    -3     2     4 *)
+        (* 3     0    -1     5 *)
+        (* -2     1     0     6 *)
+        (* 0     0     0     0  *)
+        (* 'VecTose3:18' se3mat = [VecToso3(V(1: 3)), V(4: 6); 0, 0, 0, 0]; *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3-vector (angular velocity). *)
+        (* Returns the skew symmetric matrix in so(3). *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* omg = [1; 2; 3]; *)
+        (* so3mat = VecToso3(omg) *)
+        
+        (* Output: *)
+        (* so3mat = *)
+        (* 0    -3     2 *)
+        (* 3     0    -1 *)
+        (* -2     1     0 *)
+        (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+        se3mat[4] :=  -V[2];
+        se3mat[8] := V[1];
+        se3mat[1] := V[2];
+        se3mat[9] :=  -V[0];
+        se3mat[2] :=  -V[1];
+        se3mat[6] := V[0];
+        se3mat[12] := V[3];
+        se3mat[13] := V[4];
+        se3mat[14] := V[5];
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a se(3) representation of exponential coordinates. *)
+        (* Returns a T matrix in SE(3) that is achieved by traveling along/about the  *)
+        (* screw axis S for a distance theta from an initial configuration T = I. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* se3mat = [ 0,      0,       0,      0; *)
+        (* 0,      0, -1.5708, 2.3562; *)
+        (* 0, 1.5708,       0, 2.3562; *)
+        (* 0,      0,       0,      0] *)
+        (* T = MatrixExp6(se3mat) *)
+        
+        (* Output: *)
+        (* T = *)
+        (* 1.0000         0         0         0 *)
+        (* 0    0.0000   -1.0000   -0.0000 *)
+        (* 0    1.0000    0.0000    3.0000 *)
+        (* 0         0         0    1.0000  *)
+        (* 'MatrixExp6:22' omgtheta = so3ToVec(se3mat(1: 3, 1: 3)); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+        (* Returns the corresponding 3-vector (angular velocity). *)
+        (* Example Input:  *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* omg = so3ToVec(so3mat)   *)
+        
+        (* Output: *)
+        (* omg = *)
+        (* 1 *)
+        (* 2 *)
+        (* 3 *)
+        (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+        (* 'MatrixExp6:23' if NearZero(norm(omgtheta)) *)
+        (* *** BASIC HELPER FUNCTIONS *** *)
+        (* Takes a scalar. *)
+        (* Checks if the scalar is small enough to be neglected. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* near = -1e-7; *)
+        (* judge = NearZero(near) *)
+        
+        (* Output: *)
+        (* judge = *)
+        (* 1 *)
+        (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+        se3mat_0[0] := V[0];
+        se3mat_0[1] := V[1];
+        se3mat_0[2] := V[2];
+        e_theta := norm(x := se3mat_0);
+        IF ABS(e_theta) < 1.0E-6 THEN 
+            (* 'MatrixExp6:24' T = [eye(3), se3mat(1: 3, 4); 0, 0, 0, 1]; *)
+            i0_eye();
+            tmp_0 := i0_eye.I;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                a[R_tmp] := tmp_0[3 * Slist_tmp_0];
+                a[R_tmp + 1] := tmp_0[(3 * Slist_tmp_0) + 1];
+                a[R_tmp + 2] := tmp_0[(3 * Slist_tmp_0) + 2];
+                a[Slist_tmp_0 + 12] := se3mat[Slist_tmp_0 + 12];
+            END_FOR;
+            a[3] := 0.0;
+            a[7] := 0.0;
+            a[11] := 0.0;
+            a[15] := 1.0;
+        ELSE 
+            (* 'MatrixExp6:25' else *)
+            (* 'MatrixExp6:26' [omghat, theta] = AxisAng3(omgtheta); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes A 3-vector of exponential coordinates for rotation. *)
+            (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+            (* angle theta. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* expc3 = [1; 2; 3]; *)
+            (* [omghat, theta] = AxisAng3(expc3)   *)
+            
+            (* Output: *)
+            (* omghat = *)
+            (* 0.2673 *)
+            (* 0.5345 *)
+            (* 0.8018 *)
+            (* theta = *)
+            (* 3.7417 *)
+            (* 'AxisAng3:20' theta = norm(expc3); *)
+            (* 'AxisAng3:21' omghat = expc3 / theta; *)
+            (* 'MatrixExp6:27' omgmat = se3mat(1: 3, 1: 3) / theta; *)
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / e_theta;
+                omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / e_theta;
+                omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / e_theta;
+            END_FOR;
+            (* 'MatrixExp6:28' T = [MatrixExp3(se3mat(1: 3, 1: 3)), ... *)
+            (* 'MatrixExp6:29'          (eye(3) * theta + (1 - cos(theta)) * omgmat ... *)
+            (* 'MatrixExp6:30'           + (theta - sin(theta)) * omgmat * omgmat) ... *)
+            (* 'MatrixExp6:31'             * se3mat(1: 3, 4) / theta; *)
+            (* 'MatrixExp6:32'          0, 0, 0, 1]; *)
+            thetalist0_0 := 1.0 - COS(e_theta);
+            g_a := e_theta - SIN(e_theta);
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes a 3x3 so(3) representation of exponential coordinates. *)
+            (* Returns R in SO(3) that is achieved by rotating about omghat by theta  *)
+            (* from an initial orientation R = I. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+            (* R = MatrixExp3(so3mat)   *)
+            
+            (* Output: *)
+            (* R = *)
+            (* -0.6949    0.7135    0.0893 *)
+            (* -0.1920   -0.3038    0.9332 *)
+            (* 0.6930    0.6313    0.3481 *)
+            (* 'MatrixExp3:18' omgtheta = so3ToVec(so3mat); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+            (* Returns the corresponding 3-vector (angular velocity). *)
+            (* Example Input:  *)
+            
+            (* clear; clc; *)
+            (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+            (* omg = so3ToVec(so3mat)   *)
+            
+            (* Output: *)
+            (* omg = *)
+            (* 1 *)
+            (* 2 *)
+            (* 3 *)
+            (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+            (* 'MatrixExp3:19' if NearZero(norm(omgtheta)) *)
+            (* *** BASIC HELPER FUNCTIONS *** *)
+            (* Takes a scalar. *)
+            (* Checks if the scalar is small enough to be neglected. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* near = -1e-7; *)
+            (* judge = NearZero(near) *)
+            
+            (* Output: *)
+            (* judge = *)
+            (* 1 *)
+            (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+            se3mat_0[0] := V[0];
+            se3mat_0[1] := V[1];
+            se3mat_0[2] := V[2];
+            h_theta := norm(x := se3mat_0);
+            IF ABS(h_theta) < 1.0E-6 THEN 
+                (* 'MatrixExp3:20' R = eye(3); *)
+                i0_eye();
+                b_R := i0_eye.I;
+            ELSE 
+                (* 'MatrixExp3:21' else *)
+                (* 'MatrixExp3:22' [omghat, theta] = AxisAng3(omgtheta); *)
+                (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+                (* Takes A 3-vector of exponential coordinates for rotation. *)
+                (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+                (* angle theta. *)
+                (* Example Input: *)
+                
+                (* clear; clc; *)
+                (* expc3 = [1; 2; 3]; *)
+                (* [omghat, theta] = AxisAng3(expc3)   *)
+                
+                (* Output: *)
+                (* omghat = *)
+                (* 0.2673 *)
+                (* 0.5345 *)
+                (* 0.8018 *)
+                (* theta = *)
+                (* 3.7417 *)
+                (* 'AxisAng3:20' theta = norm(expc3); *)
+                (* 'AxisAng3:21' omghat = expc3 / theta; *)
+                (* 'MatrixExp3:23' omgmat = so3mat / theta; *)
+                FOR Slist_tmp_0 := 0 TO 2 DO 
+                    omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                    b_omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / h_theta;
+                    b_omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / h_theta;
+                    b_omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / h_theta;
+                END_FOR;
+                (* 'MatrixExp3:24' R = eye(3) + sin(theta) * omgmat + (1 - cos(theta)) * omgmat * omgmat; *)
+                l_a := SIN(h_theta);
+                x_tmp := COS(h_theta);
+                i0_eye();
+                tmp_0 := i0_eye.I;
+                FOR Slist_tmp_0 := 0 TO 2 DO 
+                    FOR omgmat_tmp := 0 TO 2 DO 
+                        R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                        b_R[R_tmp] := (((((1.0 - x_tmp) * b_omgmat[Slist_tmp_0 + 3]) * b_omgmat[(3 * omgmat_tmp) + 1]) + (((1.0 - x_tmp) * b_omgmat[Slist_tmp_0]) * b_omgmat[3 * omgmat_tmp])) + ((b_omgmat[Slist_tmp_0 + 6] * (1.0 - x_tmp)) * b_omgmat[(3 * omgmat_tmp) + 2])) + ((b_omgmat[R_tmp] * l_a) + tmp_0[R_tmp]);
+                    END_FOR;
+                END_FOR;
+            END_IF;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                l_a := 0.0;
+                FOR omgmat_tmp := 0 TO 2 DO 
+                    R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                    l_a := ((((((omgmat[Slist_tmp_0 + 3] * g_a) * omgmat[(3 * omgmat_tmp) + 1]) + ((g_a * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * g_a) * omgmat[(3 * omgmat_tmp) + 2])) + ((SINT_TO_LREAL(p_a[R_tmp]) * e_theta) + (omgmat[R_tmp] * thetalist0_0))) * se3mat[omgmat_tmp + 12]) + l_a;
+                    a[omgmat_tmp + (Slist_tmp_0 * 4)] := b_R[(3 * Slist_tmp_0) + omgmat_tmp];
+                END_FOR;
+                a[Slist_tmp_0 + 12] := l_a / e_theta;
+            END_FOR;
+            a[3] := 0.0;
+            a[7] := 0.0;
+            a[11] := 0.0;
+            a[15] := 1.0;
+        END_IF;
+        FOR Slist_tmp_0 := 0 TO 3 DO 
+            FOR omgmat_tmp := 0 TO 3 DO 
+                a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+                R_tmp := Slist_tmp_0 + a_tmp_tmp;
+                b_T[R_tmp] := 0.0;
+                b_T[R_tmp] := b_T[R_tmp] + (a[a_tmp_tmp] * a_0[Slist_tmp_0]);
+                b_T[R_tmp] := (a[a_tmp_tmp + 1] * a_0[Slist_tmp_0 + 4]) + b_T[R_tmp];
+                b_T[R_tmp] := (a[a_tmp_tmp + 2] * a_0[Slist_tmp_0 + 8]) + b_T[R_tmp];
+                b_T[R_tmp] := (a[a_tmp_tmp + 3] * a_0[Slist_tmp_0 + 12]) + b_T[R_tmp];
+            END_FOR;
+        END_FOR;
+        FOR Slist_tmp_0 := 0 TO 15 DO 
+            a_0[Slist_tmp_0] := b_T[Slist_tmp_0];
+        END_FOR;
+        (* 'JacobianSpace:31' Js(:, i) = Adjoint(T) * Slist(:, i); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes T a transformation matrix SE3.  *)
+        (* Returns the corresponding 6x6 adjoint representation [AdT]. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+        (* AdT = Adjoint(T) *)
+        
+        (* Output: *)
+        (* AdT = *)
+        (* 1     0     0     0     0     0 *)
+        (* 0     0    -1     0     0     0 *)
+        (* 0     1     0     0     0     0 *)
+        (* 0     0     3     1     0     0 *)
+        (* 3     0     0     0     0    -1 *)
+        (* 0     0     0     0     1     0 *)
+        (* 'Adjoint:20' [R, p] = TransToRp(T); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes the transformation matrix T in SE(3)  *)
+        (* Returns R: the corresponding rotation matrix *)
+        (* p: the corresponding position vector . *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+        (* [R, p] = TransToRp(T) *)
+        
+        (* Output: *)
+        (* R = *)
+        (* 1     0     0 *)
+        (* 0     0    -1 *)
+        (* 0     1     0 *)
+        (* p = *)
+        (* 0 *)
+        (* 0 *)
+        (* 3 *)
+        (* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+        (* 'TransToRp:23' p = T(1: 3, 4); *)
+        (* 'Adjoint:21' AdT = [R, zeros(3); VecToso3(p) * R, R]; *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3-vector (angular velocity). *)
+        (* Returns the skew symmetric matrix in so(3). *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* omg = [1; 2; 3]; *)
+        (* so3mat = VecToso3(omg) *)
+        
+        (* Output: *)
+        (* so3mat = *)
+        (* 0    -3     2 *)
+        (* 3     0    -1 *)
+        (* -2     1     0 *)
+        (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+        tmp_3[3] :=  -a_0[14];
+        tmp_3[6] := a_0[13];
+        tmp_3[1] := a_0[14];
+        tmp_3[7] :=  -a_0[12];
+        tmp_3[2] :=  -a_0[13];
+        tmp_3[5] := a_0[12];
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            FOR omgmat_tmp := 0 TO 2 DO 
+                R_tmp := Slist_tmp_0 + (3 * omgmat_tmp);
+                tmp_0[R_tmp] := 0.0;
+                a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+                tmp_0[R_tmp] := tmp_0[R_tmp] + (a_0[a_tmp_tmp] * tmp_3[Slist_tmp_0]);
+                tmp_0[R_tmp] := (a_0[a_tmp_tmp + 1] * tmp_3[Slist_tmp_0 + 3]) + tmp_0[R_tmp];
+                tmp_0[R_tmp] := (a_0[a_tmp_tmp + 2] * tmp_3[Slist_tmp_0 + 6]) + tmp_0[R_tmp];
+                Tsb_0[omgmat_tmp + (6 * Slist_tmp_0)] := a_0[(Slist_tmp_0 * 4) + omgmat_tmp];
+                Tsb_0[omgmat_tmp + (6 * (Slist_tmp_0 + 3))] := 0.0;
+            END_FOR;
+        END_FOR;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            Tsb_0[(6 * Slist_tmp_0) + 3] := tmp_0[3 * Slist_tmp_0];
+            R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            omgmat_tmp := 6 * (Slist_tmp_0 + 3);
+            Tsb_0[omgmat_tmp + 3] := a_0[R_tmp];
+            Tsb_0[(6 * Slist_tmp_0) + 4] := tmp_0[(3 * Slist_tmp_0) + 1];
+            Tsb_0[omgmat_tmp + 4] := a_0[R_tmp + 1];
+            Tsb_0[(6 * Slist_tmp_0) + 5] := tmp_0[(3 * Slist_tmp_0) + 2];
+            Tsb_0[omgmat_tmp + 5] := a_0[R_tmp + 2];
+        END_FOR;
+        FOR Slist_tmp_0 := 0 TO 5 DO 
+            R_tmp := 6 * (d_i + 1);
+            a_tmp_tmp := Slist_tmp_0 + R_tmp;
+            Js[a_tmp_tmp] := 0.0;
+            FOR omgmat_tmp := 0 TO 5 DO 
+                Js[a_tmp_tmp] := (Slist[R_tmp + omgmat_tmp] * Tsb_0[(6 * omgmat_tmp) + Slist_tmp_0]) + Js[a_tmp_tmp];
+            END_FOR;
+        END_FOR;
+    END_FOR;
+    i0_pinv(A := Js);
+    tmp_1 := i0_pinv.X;
+    FOR Slist_tmp_0 := 0 TO 4 DO 
+        l_a := 0.0;
+        FOR omgmat_tmp := 0 TO 5 DO 
+            l_a := (tmp_1[(5 * omgmat_tmp) + Slist_tmp_0] * Vs[omgmat_tmp]) + l_a;
+        END_FOR;
+        thetalist0[Slist_tmp_0] := thetalist0[Slist_tmp_0] + l_a;
+    END_FOR;
+    (* 'IKinSpace:57' thetalistDot = pinv(JacobianSpace(Slist, thetalist)) * Vs; *)
+    (* *** CHAPTER 5: VELOCITY KINEMATICS AND STATICS *** *)
+    (* Takes Slist: The joint screw axes in the space frame when the manipulator *)
+    (* is at the home position, in the format of a matrix with the *)
+    (* screw axes as the columns, *)
+    (* thetalist: A list of joint coordinates.  *)
+    (* Returns the corresponding space Jacobian (6xn real numbers). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* Slist = [[0; 0; 1;   0; 0.2; 0.2], ... *)
+    (* [1; 0; 0;   2;   0;   3], ... *)
+    (* [0; 1; 0;   0;   2;   1], ... *)
+    (* [1; 0; 0; 0.2; 0.3; 0.4]]; *)
+    (* thetalist = [0.2; 1.1; 0.1; 1.2]; *)
+    (* Js = JacobianSpace(Slist, thetalist) *)
+    
+    (* Output: *)
+    (* Js = *)
+    (* 0    0.9801   -0.0901    0.9575 *)
+    (* 0    0.1987    0.4446    0.2849 *)
+    (* 1.0000         0    0.8912   -0.0453 *)
+    (* 0    1.9522   -2.2164   -0.5116 *)
+    (* 0.2000    0.4365   -2.4371    2.7754 *)
+    (* 0.2000    2.9603    3.2357    2.2251 *)
+    (* 'JacobianSpace:27' Js = Slist; *)
+    (* 'JacobianSpace:28' T = eye(4); *)
+    (* 'JacobianSpace:29' for i = 2: length(thetalist) *)
+    (* 'IKinSpace:58' i = i + 1; *)
+    i := i + 1;
+    (* 'IKinSpace:59' Tsb = FKinSpace(M, Slist, thetalist); *)
+    FOR Slist_tmp_0 := 0 TO 15 DO 
+        Tsb[Slist_tmp_0] := M[Slist_tmp_0];
+    END_FOR;
+    (* *** CHAPTER 4: FORWARD KINEMATICS *** *)
+    (* Takes M: the home configuration (position and orientation) of the  *)
+    (* end-effector, *)
+    (* Slist: The joint screw axes in the space frame when the manipulator *)
+    (* is at the home position, *)
+    (* thetalist: A list of joint coordinates. *)
+    (* Returns T in SE(3) representing the end-effector frame, when the joints  *)
+    (* are at the specified coordinates (i.t.o Space Frame). *)
+    (* Example Inputs: *)
+    
+    (* clear; clc; *)
+    (* M = [[-1, 0, 0, 0]; [0, 1, 0, 6]; [0, 0, -1, 2]; [0, 0, 0, 1]]; *)
+    (* Slist = [[0; 0;  1;  4; 0;    0], ... *)
+    (* [0; 0;  0;  0; 1;    0], ... *)
+    (* [0; 0; -1; -6; 0; -0.1]]; *)
+    (* thetalist =[pi / 2; 3; pi]; *)
+    (* T = FKinSpace(M, Slist, thetalist) *)
+    
+    (* Output: *)
+    (* T = *)
+    (* -0.0000    1.0000         0   -5.0000 *)
+    (* 1.0000    0.0000         0    4.0000 *)
+    (* 0         0   -1.0000    1.6858 *)
+    (* 0         0         0    1.0000 *)
+    (* 'FKinSpace:27' T = M; *)
+    (* 'FKinSpace:28' for i = size(thetalist,1): -1: 1 *)
+    se3mat[0] := 0.0;
+    se3mat[5] := 0.0;
+    se3mat[10] := 0.0;
+    se3mat[3] := 0.0;
+    se3mat[7] := 0.0;
+    se3mat[11] := 0.0;
+    se3mat[15] := 0.0;
+    FOR e_i := 0 TO 4 DO 
+        (* 'FKinSpace:29' T = MatrixExp6(VecTose3(Slist(:, i) * thetalist(i))) * T; *)
+        thetalist0_0 := thetalist0[4 - e_i];
+        FOR Slist_tmp_0 := 0 TO 5 DO 
+            V[Slist_tmp_0] := Slist[((4 - e_i) * 6) + Slist_tmp_0] * thetalist0_0;
+        END_FOR;
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 6-vector (representing a spatial velocity). *)
+        (* Returns the corresponding 4x4 se(3) matrix. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* V = [1; 2; 3; 4; 5; 6]; *)
+        (* se3mat = VecTose3(V) *)
+        
+        (* Output: *)
+        (* se3mat = *)
+        (* 0    -3     2     4 *)
+        (* 3     0    -1     5 *)
+        (* -2     1     0     6 *)
+        (* 0     0     0     0  *)
+        (* 'VecTose3:18' se3mat = [VecToso3(V(1: 3)), V(4: 6); 0, 0, 0, 0]; *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3-vector (angular velocity). *)
+        (* Returns the skew symmetric matrix in so(3). *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* omg = [1; 2; 3]; *)
+        (* so3mat = VecToso3(omg) *)
+        
+        (* Output: *)
+        (* so3mat = *)
+        (* 0    -3     2 *)
+        (* 3     0    -1 *)
+        (* -2     1     0 *)
+        (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+        se3mat[4] :=  -V[2];
+        se3mat[8] := V[1];
+        se3mat[1] := V[2];
+        se3mat[9] :=  -V[0];
+        se3mat[2] :=  -V[1];
+        se3mat[6] := V[0];
+        se3mat[12] := V[3];
+        se3mat[13] := V[4];
+        se3mat[14] := V[5];
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a se(3) representation of exponential coordinates. *)
+        (* Returns a T matrix in SE(3) that is achieved by traveling along/about the  *)
+        (* screw axis S for a distance theta from an initial configuration T = I. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* se3mat = [ 0,      0,       0,      0; *)
+        (* 0,      0, -1.5708, 2.3562; *)
+        (* 0, 1.5708,       0, 2.3562; *)
+        (* 0,      0,       0,      0] *)
+        (* T = MatrixExp6(se3mat) *)
+        
+        (* Output: *)
+        (* T = *)
+        (* 1.0000         0         0         0 *)
+        (* 0    0.0000   -1.0000   -0.0000 *)
+        (* 0    1.0000    0.0000    3.0000 *)
+        (* 0         0         0    1.0000  *)
+        (* 'MatrixExp6:22' omgtheta = so3ToVec(se3mat(1: 3, 1: 3)); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+        (* Returns the corresponding 3-vector (angular velocity). *)
+        (* Example Input:  *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* omg = so3ToVec(so3mat)   *)
+        
+        (* Output: *)
+        (* omg = *)
+        (* 1 *)
+        (* 2 *)
+        (* 3 *)
+        (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+        omgtheta[0] := V[0];
+        omgtheta[1] := V[1];
+        omgtheta[2] := V[2];
+        (* 'MatrixExp6:23' if NearZero(norm(omgtheta)) *)
+        (* *** BASIC HELPER FUNCTIONS *** *)
+        (* Takes a scalar. *)
+        (* Checks if the scalar is small enough to be neglected. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* near = -1e-7; *)
+        (* judge = NearZero(near) *)
+        
+        (* Output: *)
+        (* judge = *)
+        (* 1 *)
+        (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+        f_theta := norm(x := omgtheta);
+        IF ABS(f_theta) < 1.0E-6 THEN 
+            (* 'MatrixExp6:24' T = [eye(3), se3mat(1: 3, 4); 0, 0, 0, 1]; *)
+            i0_eye();
+            tmp_0 := i0_eye.I;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                a[R_tmp] := tmp_0[3 * Slist_tmp_0];
+                a[R_tmp + 1] := tmp_0[(3 * Slist_tmp_0) + 1];
+                a[R_tmp + 2] := tmp_0[(3 * Slist_tmp_0) + 2];
+                a[Slist_tmp_0 + 12] := se3mat[Slist_tmp_0 + 12];
+            END_FOR;
+            a[3] := 0.0;
+            a[7] := 0.0;
+            a[11] := 0.0;
+            a[15] := 1.0;
+        ELSE 
+            (* 'MatrixExp6:25' else *)
+            (* 'MatrixExp6:26' [omghat, theta] = AxisAng3(omgtheta); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes A 3-vector of exponential coordinates for rotation. *)
+            (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+            (* angle theta. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* expc3 = [1; 2; 3]; *)
+            (* [omghat, theta] = AxisAng3(expc3)   *)
+            
+            (* Output: *)
+            (* omghat = *)
+            (* 0.2673 *)
+            (* 0.5345 *)
+            (* 0.8018 *)
+            (* theta = *)
+            (* 3.7417 *)
+            (* 'AxisAng3:20' theta = norm(expc3); *)
+            (* 'AxisAng3:21' omghat = expc3 / theta; *)
+            (* 'MatrixExp6:27' omgmat = se3mat(1: 3, 1: 3) / theta; *)
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / f_theta;
+                omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / f_theta;
+                omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / f_theta;
+            END_FOR;
+            (* 'MatrixExp6:28' T = [MatrixExp3(se3mat(1: 3, 1: 3)), ... *)
+            (* 'MatrixExp6:29'          (eye(3) * theta + (1 - cos(theta)) * omgmat ... *)
+            (* 'MatrixExp6:30'           + (theta - sin(theta)) * omgmat * omgmat) ... *)
+            (* 'MatrixExp6:31'             * se3mat(1: 3, 4) / theta; *)
+            (* 'MatrixExp6:32'          0, 0, 0, 1]; *)
+            thetalist0_0 := 1.0 - COS(f_theta);
+            g_a := f_theta - SIN(f_theta);
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes a 3x3 so(3) representation of exponential coordinates. *)
+            (* Returns R in SO(3) that is achieved by rotating about omghat by theta  *)
+            (* from an initial orientation R = I. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+            (* R = MatrixExp3(so3mat)   *)
+            
+            (* Output: *)
+            (* R = *)
+            (* -0.6949    0.7135    0.0893 *)
+            (* -0.1920   -0.3038    0.9332 *)
+            (* 0.6930    0.6313    0.3481 *)
+            (* 'MatrixExp3:18' omgtheta = so3ToVec(so3mat); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+            (* Returns the corresponding 3-vector (angular velocity). *)
+            (* Example Input:  *)
+            
+            (* clear; clc; *)
+            (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+            (* omg = so3ToVec(so3mat)   *)
+            
+            (* Output: *)
+            (* omg = *)
+            (* 1 *)
+            (* 2 *)
+            (* 3 *)
+            (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+            (* 'MatrixExp3:19' if NearZero(norm(omgtheta)) *)
+            (* *** BASIC HELPER FUNCTIONS *** *)
+            (* Takes a scalar. *)
+            (* Checks if the scalar is small enough to be neglected. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* near = -1e-7; *)
+            (* judge = NearZero(near) *)
+            
+            (* Output: *)
+            (* judge = *)
+            (* 1 *)
+            (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+            se3mat_0[0] := V[0];
+            se3mat_0[1] := V[1];
+            se3mat_0[2] := V[2];
+            j_theta := norm(x := se3mat_0);
+            IF ABS(j_theta) < 1.0E-6 THEN 
+                (* 'MatrixExp3:20' R = eye(3); *)
+                i0_eye();
+                b_R := i0_eye.I;
+            ELSE 
+                (* 'MatrixExp3:21' else *)
+                (* 'MatrixExp3:22' [omghat, theta] = AxisAng3(omgtheta); *)
+                (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+                (* Takes A 3-vector of exponential coordinates for rotation. *)
+                (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+                (* angle theta. *)
+                (* Example Input: *)
+                
+                (* clear; clc; *)
+                (* expc3 = [1; 2; 3]; *)
+                (* [omghat, theta] = AxisAng3(expc3)   *)
+                
+                (* Output: *)
+                (* omghat = *)
+                (* 0.2673 *)
+                (* 0.5345 *)
+                (* 0.8018 *)
+                (* theta = *)
+                (* 3.7417 *)
+                (* 'AxisAng3:20' theta = norm(expc3); *)
+                (* 'AxisAng3:21' omghat = expc3 / theta; *)
+                (* 'MatrixExp3:23' omgmat = so3mat / theta; *)
+                FOR Slist_tmp_0 := 0 TO 2 DO 
+                    omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                    b_omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / j_theta;
+                    b_omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / j_theta;
+                    b_omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / j_theta;
+                END_FOR;
+                (* 'MatrixExp3:24' R = eye(3) + sin(theta) * omgmat + (1 - cos(theta)) * omgmat * omgmat; *)
+                l_a := SIN(j_theta);
+                x_tmp := COS(j_theta);
+                i0_eye();
+                tmp_0 := i0_eye.I;
+                FOR Slist_tmp_0 := 0 TO 2 DO 
+                    FOR omgmat_tmp := 0 TO 2 DO 
+                        R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                        b_R[R_tmp] := (((((1.0 - x_tmp) * b_omgmat[Slist_tmp_0 + 3]) * b_omgmat[(3 * omgmat_tmp) + 1]) + (((1.0 - x_tmp) * b_omgmat[Slist_tmp_0]) * b_omgmat[3 * omgmat_tmp])) + ((b_omgmat[Slist_tmp_0 + 6] * (1.0 - x_tmp)) * b_omgmat[(3 * omgmat_tmp) + 2])) + ((b_omgmat[R_tmp] * l_a) + tmp_0[R_tmp]);
+                    END_FOR;
+                END_FOR;
+            END_IF;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                l_a := 0.0;
+                FOR omgmat_tmp := 0 TO 2 DO 
+                    R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                    l_a := ((((((omgmat[Slist_tmp_0 + 3] * g_a) * omgmat[(3 * omgmat_tmp) + 1]) + ((g_a * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * g_a) * omgmat[(3 * omgmat_tmp) + 2])) + ((SINT_TO_LREAL(p_a[R_tmp]) * f_theta) + (omgmat[R_tmp] * thetalist0_0))) * se3mat[omgmat_tmp + 12]) + l_a;
+                    a[omgmat_tmp + (Slist_tmp_0 * 4)] := b_R[(3 * Slist_tmp_0) + omgmat_tmp];
+                END_FOR;
+                a[Slist_tmp_0 + 12] := l_a / f_theta;
+            END_FOR;
+            a[3] := 0.0;
+            a[7] := 0.0;
+            a[11] := 0.0;
+            a[15] := 1.0;
+        END_IF;
+        FOR Slist_tmp_0 := 0 TO 3 DO 
+            FOR omgmat_tmp := 0 TO 3 DO 
+                a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+                R_tmp := Slist_tmp_0 + a_tmp_tmp;
+                a_0[R_tmp] := 0.0;
+                a_0[R_tmp] := a_0[R_tmp] + (Tsb[a_tmp_tmp] * a[Slist_tmp_0]);
+                a_0[R_tmp] := (Tsb[a_tmp_tmp + 1] * a[Slist_tmp_0 + 4]) + a_0[R_tmp];
+                a_0[R_tmp] := (Tsb[a_tmp_tmp + 2] * a[Slist_tmp_0 + 8]) + a_0[R_tmp];
+                a_0[R_tmp] := (Tsb[a_tmp_tmp + 3] * a[Slist_tmp_0 + 12]) + a_0[R_tmp];
+            END_FOR;
+        END_FOR;
+        FOR Slist_tmp_0 := 0 TO 15 DO 
+            Tsb[Slist_tmp_0] := a_0[Slist_tmp_0];
+        END_FOR;
+    END_FOR;
+    (* 'IKinSpace:60' Vs = Adjoint(Tsb) * se3ToVec(MatrixLog6(TransInv(Tsb) * T)); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a transformation matrix T. *)
+    (* Returns its inverse.  *)
+    (* Uses the structure of transformation matrices to avoid taking a matrix *)
+    (* inverse, for efficiency. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* invT = TransInv(T) *)
+    
+    (* Ouput: *)
+    (* invT = *)
+    (* 1     0     0     0 *)
+    (* 0     0     1    -3 *)
+    (* 0    -1     0     0 *)
+    (* 0     0     0     1 *)
+    (* 'TransInv:20' [R, p] = TransToRp(T); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes the transformation matrix T in SE(3)  *)
+    (* Returns R: the corresponding rotation matrix *)
+    (* p: the corresponding position vector . *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* [R, p] = TransToRp(T) *)
+    
+    (* Output: *)
+    (* R = *)
+    (* 1     0     0 *)
+    (* 0     0    -1 *)
+    (* 0     1     0 *)
+    (* p = *)
+    (* 0 *)
+    (* 0 *)
+    (* 3 *)
+    (* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+    (* 'TransToRp:23' p = T(1: 3, 4); *)
+    (* 'TransInv:21' invT = [transpose(R), -transpose(R) * p; 0, 0, 0, 1]; *)
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        omgmat[3 * Slist_tmp_0] := Tsb[Slist_tmp_0];
+        omgmat[(3 * Slist_tmp_0) + 1] := Tsb[Slist_tmp_0 + 4];
+        omgmat[(3 * Slist_tmp_0) + 2] := Tsb[Slist_tmp_0 + 8];
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 8 DO 
+        b_R[Slist_tmp_0] :=  -omgmat[Slist_tmp_0];
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        se3mat[omgmat_tmp] := omgmat[3 * Slist_tmp_0];
+        se3mat[omgmat_tmp + 1] := omgmat[(3 * Slist_tmp_0) + 1];
+        se3mat[omgmat_tmp + 2] := omgmat[(3 * Slist_tmp_0) + 2];
+        se3mat[Slist_tmp_0 + 12] := (b_R[Slist_tmp_0 + 6] * Tsb[14]) + ((b_R[Slist_tmp_0 + 3] * Tsb[13]) + (b_R[Slist_tmp_0] * Tsb[12]));
+    END_FOR;
+    se3mat[3] := 0.0;
+    se3mat[7] := 0.0;
+    se3mat[11] := 0.0;
+    se3mat[15] := 1.0;
+    FOR Slist_tmp_0 := 0 TO 3 DO 
+        FOR omgmat_tmp := 0 TO 3 DO 
+            a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+            R_tmp := Slist_tmp_0 + a_tmp_tmp;
+            a_0[R_tmp] := 0.0;
+            a_0[R_tmp] := a_0[R_tmp] + (T[a_tmp_tmp] * se3mat[Slist_tmp_0]);
+            a_0[R_tmp] := (T[a_tmp_tmp + 1] * se3mat[Slist_tmp_0 + 4]) + a_0[R_tmp];
+            a_0[R_tmp] := (T[a_tmp_tmp + 2] * se3mat[Slist_tmp_0 + 8]) + a_0[R_tmp];
+            a_0[R_tmp] := (T[a_tmp_tmp + 3] * se3mat[Slist_tmp_0 + 12]) + a_0[R_tmp];
+        END_FOR;
+    END_FOR;
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a transformation matrix T in SE(3). *)
+    (* Returns the corresponding se(3) representation of exponential  *)
+    (* coordinates. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* expmat = MatrixLog6(T) *)
+    
+    (* Output: *)
+    (* expc6 = *)
+    (* 0         0         0         0 *)
+    (* 0         0   -1.5708    2.3562 *)
+    (* 0    1.5708         0    2.3562 *)
+    (* 0         0         0         0 *)
+    (* 'MatrixLog6:19' [R, p] = TransToRp(T); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes the transformation matrix T in SE(3)  *)
+    (* Returns R: the corresponding rotation matrix *)
+    (* p: the corresponding position vector . *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* [R, p] = TransToRp(T) *)
+    
+    (* Output: *)
+    (* R = *)
+    (* 1     0     0 *)
+    (* 0     0    -1 *)
+    (* 0     1     0 *)
+    (* p = *)
+    (* 0 *)
+    (* 0 *)
+    (* 3 *)
+    (* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+    (* 'TransToRp:23' p = T(1: 3, 4); *)
+    (* 'MatrixLog6:20' omgmat = MatrixLog3(R); *)
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        b_R[3 * Slist_tmp_0] := a_0[R_tmp];
+        b_R[(3 * Slist_tmp_0) + 1] := a_0[R_tmp + 1];
+        b_R[(3 * Slist_tmp_0) + 2] := a_0[R_tmp + 2];
+    END_FOR;
+    i0_MatrixLog3(b_R := b_R);
+    omgmat := i0_MatrixLog3.so3mat;
+    (* 'MatrixLog6:21' if isequal(omgmat, zeros(3)) *)
+    IF isequal(varargin_1 := omgmat, varargin_2 := tmp_4) THEN 
+        (* 'MatrixLog6:22' expmat = [zeros(3), T(1: 3, 4); 0, 0, 0, 0]; *)
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            se3mat[omgmat_tmp] := 0.0;
+            se3mat[omgmat_tmp + 1] := 0.0;
+            se3mat[omgmat_tmp + 2] := 0.0;
+            se3mat[Slist_tmp_0 + 12] := a_0[Slist_tmp_0 + 12];
+        END_FOR;
+        se3mat[3] := 0.0;
+        se3mat[7] := 0.0;
+        se3mat[11] := 0.0;
+        se3mat[15] := 0.0;
+    ELSE 
+        (* 'MatrixLog6:23' else *)
+        (* 'MatrixLog6:24' theta = acos((trace(R) - 1) / 2); *)
+        b_theta := ACOS((((a_0[0] + a_0[5]) + a_0[10]) - 1.0) / 2.0);
+        (* 'MatrixLog6:25' expmat = [omgmat, (eye(3) - omgmat / 2 ... *)
+        (* 'MatrixLog6:26'                       + (1 / theta - cot(theta / 2) / 2) ... *)
+        (* 'MatrixLog6:27'                         * omgmat * omgmat / theta) * p; *)
+        (* 'MatrixLog6:28'               0, 0, 0, 0]; *)
+        thetalist0_0 := (1.0 / b_theta) - ((1.0 / TAN(b_theta / 2.0)) / 2.0);
+        i0_eye();
+        tmp_0 := i0_eye.I;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            se3mat_0[Slist_tmp_0] := 0.0;
+            FOR omgmat_tmp := 0 TO 2 DO 
+                se3mat[omgmat_tmp + (Slist_tmp_0 * 4)] := omgmat[(3 * Slist_tmp_0) + omgmat_tmp];
+                R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                se3mat_0[Slist_tmp_0] := (((((((omgmat[Slist_tmp_0 + 3] * thetalist0_0) * omgmat[(3 * omgmat_tmp) + 1]) + ((thetalist0_0 * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * thetalist0_0) * omgmat[(3 * omgmat_tmp) + 2])) / b_theta) + (tmp_0[R_tmp] - (omgmat[R_tmp] / 2.0))) * a_0[omgmat_tmp + 12]) + se3mat_0[Slist_tmp_0];
+            END_FOR;
+            se3mat[Slist_tmp_0 + 12] := se3mat_0[Slist_tmp_0];
+        END_FOR;
+        se3mat[3] := 0.0;
+        se3mat[7] := 0.0;
+        se3mat[11] := 0.0;
+        se3mat[15] := 0.0;
+    END_IF;
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes T a transformation matrix SE3.  *)
+    (* Returns the corresponding 6x6 adjoint representation [AdT]. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* AdT = Adjoint(T) *)
+    
+    (* Output: *)
+    (* AdT = *)
+    (* 1     0     0     0     0     0 *)
+    (* 0     0    -1     0     0     0 *)
+    (* 0     1     0     0     0     0 *)
+    (* 0     0     3     1     0     0 *)
+    (* 3     0     0     0     0    -1 *)
+    (* 0     0     0     0     1     0 *)
+    (* 'Adjoint:20' [R, p] = TransToRp(T); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes the transformation matrix T in SE(3)  *)
+    (* Returns R: the corresponding rotation matrix *)
+    (* p: the corresponding position vector . *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* [R, p] = TransToRp(T) *)
+    
+    (* Output: *)
+    (* R = *)
+    (* 1     0     0 *)
+    (* 0     0    -1 *)
+    (* 0     1     0 *)
+    (* p = *)
+    (* 0 *)
+    (* 0 *)
+    (* 3 *)
+    (* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+    (* 'TransToRp:23' p = T(1: 3, 4); *)
+    (* 'Adjoint:21' AdT = [R, zeros(3); VecToso3(p) * R, R]; *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3-vector (angular velocity). *)
+    (* Returns the skew symmetric matrix in so(3). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* omg = [1; 2; 3]; *)
+    (* so3mat = VecToso3(omg) *)
+    
+    (* Output: *)
+    (* so3mat = *)
+    (* 0    -3     2 *)
+    (* 3     0    -1 *)
+    (* -2     1     0 *)
+    (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes se3mat a 4x4 se(3) matrix *)
+    (* Returns the corresponding 6-vector (representing spatial velocity). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* se3mat = [[0, -3, 2, 4]; [3, 0, -1, 5]; [-2, 1, 0, 6]; [0, 0, 0, 0]]; *)
+    (* V = se3ToVec(se3mat) *)
+    
+    (* Output: *)
+    (* V = *)
+    (* 1 *)
+    (* 2 *)
+    (* 3 *)
+    (* 4 *)
+    (* 5 *)
+    (* 6 *)
+    (* 'se3ToVec:20' V = [se3mat(3, 2); se3mat(1, 3); se3mat(2, 1); se3mat(1: 3, 4)]; *)
+    tmp_5[3] :=  -Tsb[14];
+    tmp_5[6] := Tsb[13];
+    tmp_5[1] := Tsb[14];
+    tmp_5[7] :=  -Tsb[12];
+    tmp_5[2] :=  -Tsb[13];
+    tmp_5[5] := Tsb[12];
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        FOR omgmat_tmp := 0 TO 2 DO 
+            R_tmp := Slist_tmp_0 + (3 * omgmat_tmp);
+            tmp_0[R_tmp] := 0.0;
+            a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+            tmp_0[R_tmp] := tmp_0[R_tmp] + (Tsb[a_tmp_tmp] * tmp_5[Slist_tmp_0]);
+            tmp_0[R_tmp] := (Tsb[a_tmp_tmp + 1] * tmp_5[Slist_tmp_0 + 3]) + tmp_0[R_tmp];
+            tmp_0[R_tmp] := (Tsb[a_tmp_tmp + 2] * tmp_5[Slist_tmp_0 + 6]) + tmp_0[R_tmp];
+            Tsb_0[omgmat_tmp + (6 * Slist_tmp_0)] := Tsb[(Slist_tmp_0 * 4) + omgmat_tmp];
+            Tsb_0[omgmat_tmp + (6 * (Slist_tmp_0 + 3))] := 0.0;
+        END_FOR;
+    END_FOR;
+    V[0] := se3mat[6];
+    V[1] := se3mat[8];
+    V[2] := se3mat[1];
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        Tsb_0[(6 * Slist_tmp_0) + 3] := tmp_0[3 * Slist_tmp_0];
+        omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        R_tmp := 6 * (Slist_tmp_0 + 3);
+        Tsb_0[R_tmp + 3] := Tsb[omgmat_tmp];
+        Tsb_0[(6 * Slist_tmp_0) + 4] := tmp_0[(3 * Slist_tmp_0) + 1];
+        Tsb_0[R_tmp + 4] := Tsb[omgmat_tmp + 1];
+        Tsb_0[(6 * Slist_tmp_0) + 5] := tmp_0[(3 * Slist_tmp_0) + 2];
+        Tsb_0[R_tmp + 5] := Tsb[omgmat_tmp + 2];
+        V[Slist_tmp_0 + 3] := se3mat[Slist_tmp_0 + 12];
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 5 DO 
+        Vs[Slist_tmp_0] := 0.0;
+        FOR omgmat_tmp := 0 TO 5 DO 
+            Vs[Slist_tmp_0] := (Tsb_0[(6 * omgmat_tmp) + Slist_tmp_0] * V[omgmat_tmp]) + Vs[Slist_tmp_0];
+        END_FOR;
+    END_FOR;
+    (* 'IKinSpace:61' err = norm(Vs(1: 3)) > eomg || norm(Vs(4: 6)) > ev; *)
+    se3mat_0[0] := Vs[0];
+    se3mat_0[1] := Vs[1];
+    se3mat_0[2] := Vs[2];
+    IF norm(x := se3mat_0) <= 1.0E-5 THEN 
+        se3mat_0[0] := Vs[3];
+        se3mat_0[1] := Vs[4];
+        se3mat_0[2] := Vs[5];
+        IF norm(x := se3mat_0) <= 1.0E-7 THEN 
+            err := FALSE;
+        END_IF;
+    END_IF;
+END_WHILE;
+(* 'IKinSpace:63' success = ~ err; *)
+(* For velocity Kinematics 4 dof. *)
+(* '<S1>:1:70' Vs = [0; 0;0; Vx; Vy; Vz]; *)
+(* '<S1>:1:71' thetalist0_4DOF = [q1Inn; q2Inn; q3Inn; q4Inn; q5Inn; q6Inn]; *)
+Vs[0] := q1Inn;
+Vs[1] := q2Inn;
+Vs[2] := q3Inn;
+Vs[3] := q4Inn;
+Vs[4] := q5Inn;
+Vs[5] :=  -q1Inn;
+(* '<S1>:1:72' Slist_4DOF = [S1,S2,S3,S4,S5,S6]; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 5 DO 
+    Tsb_0[Slist_tmp_0] := SINT_TO_LREAL(Slist_tmp[Slist_tmp_0]);
+    Tsb_0[Slist_tmp_0 + 6] := g[Slist_tmp_0];
+    Tsb_0[Slist_tmp_0 + 12] := h[Slist_tmp_0];
+    Tsb_0[Slist_tmp_0 + 18] := SINT_TO_LREAL(b_l[Slist_tmp_0]);
+    Tsb_0[Slist_tmp_0 + 24] := S5[Slist_tmp_0];
+    Tsb_0[Slist_tmp_0 + 30] := S6[Slist_tmp_0];
+END_FOR;
+(* '<S1>:1:73' J = JacobianSpace(Slist_4DOF, thetalist0_4DOF); *)
+(* *** CHAPTER 5: VELOCITY KINEMATICS AND STATICS *** *)
+(* Takes Slist: The joint screw axes in the space frame when the manipulator *)
+(* is at the home position, in the format of a matrix with the *)
+(* screw axes as the columns, *)
+(* thetalist: A list of joint coordinates.  *)
+(* Returns the corresponding space Jacobian (6xn real numbers). *)
+(* Example Input: *)
+(* clear; clc; *)
+(* Slist = [[0; 0; 1;   0; 0.2; 0.2], ... *)
+(* [1; 0; 0;   2;   0;   3], ... *)
+(* [0; 1; 0;   0;   2;   1], ... *)
+(* [1; 0; 0; 0.2; 0.3; 0.4]]; *)
+(* thetalist = [0.2; 1.1; 0.1; 1.2]; *)
+(* Js = JacobianSpace(Slist, thetalist) *)
+(* Output: *)
+(* Js = *)
+(* 0    0.9801   -0.0901    0.9575 *)
+(* 0    0.1987    0.4446    0.2849 *)
+(* 1.0000         0    0.8912   -0.0453 *)
+(* 0    1.9522   -2.2164   -0.5116 *)
+(* 0.2000    0.4365   -2.4371    2.7754 *)
+(* 0.2000    2.9603    3.2357    2.2251 *)
+(* 'JacobianSpace:27' Js = Slist; *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 35 DO 
+    J[Slist_tmp_0] := Tsb_0[Slist_tmp_0];
+END_FOR;
+(* 'JacobianSpace:28' T = eye(4); *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 15 DO 
+    T[Slist_tmp_0] := 0.0;
+END_FOR;
+T[0] := 1.0;
+T[5] := 1.0;
+T[10] := 1.0;
+T[15] := 1.0;
+(* 'JacobianSpace:29' for i = 2: length(thetalist) *)
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+se3mat[0] := 0.0;
+se3mat[5] := 0.0;
+se3mat[10] := 0.0;
+se3mat[3] := 0.0;
+se3mat[7] := 0.0;
+se3mat[11] := 0.0;
+se3mat[15] := 0.0;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+tmp_0[0] := 0.0;
+tmp_0[4] := 0.0;
+tmp_0[8] := 0.0;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR b_i := 0 TO 4 DO 
+    (* 'JacobianSpace:30' T = T * MatrixExp6(VecTose3(Slist(:, i - 1) * thetalist(i - 1))); *)
+    thetalist0_0 := Vs[b_i];
+    FOR Slist_tmp_0 := 0 TO 5 DO 
+        V[Slist_tmp_0] := Tsb_0[(6 * b_i) + Slist_tmp_0] * thetalist0_0;
+    END_FOR;
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 6-vector (representing a spatial velocity). *)
+    (* Returns the corresponding 4x4 se(3) matrix. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* V = [1; 2; 3; 4; 5; 6]; *)
+    (* se3mat = VecTose3(V) *)
+    
+    (* Output: *)
+    (* se3mat = *)
+    (* 0    -3     2     4 *)
+    (* 3     0    -1     5 *)
+    (* -2     1     0     6 *)
+    (* 0     0     0     0  *)
+    (* 'VecTose3:18' se3mat = [VecToso3(V(1: 3)), V(4: 6); 0, 0, 0, 0]; *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3-vector (angular velocity). *)
+    (* Returns the skew symmetric matrix in so(3). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* omg = [1; 2; 3]; *)
+    (* so3mat = VecToso3(omg) *)
+    
+    (* Output: *)
+    (* so3mat = *)
+    (* 0    -3     2 *)
+    (* 3     0    -1 *)
+    (* -2     1     0 *)
+    (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+    se3mat[4] :=  -V[2];
+    se3mat[8] := V[1];
+    se3mat[1] := V[2];
+    se3mat[9] :=  -V[0];
+    se3mat[2] :=  -V[1];
+    se3mat[6] := V[0];
+    se3mat[12] := V[3];
+    se3mat[13] := V[4];
+    se3mat[14] := V[5];
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a se(3) representation of exponential coordinates. *)
+    (* Returns a T matrix in SE(3) that is achieved by traveling along/about the  *)
+    (* screw axis S for a distance theta from an initial configuration T = I. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* se3mat = [ 0,      0,       0,      0; *)
+    (* 0,      0, -1.5708, 2.3562; *)
+    (* 0, 1.5708,       0, 2.3562; *)
+    (* 0,      0,       0,      0] *)
+    (* T = MatrixExp6(se3mat) *)
+    
+    (* Output: *)
+    (* T = *)
+    (* 1.0000         0         0         0 *)
+    (* 0    0.0000   -1.0000   -0.0000 *)
+    (* 0    1.0000    0.0000    3.0000 *)
+    (* 0         0         0    1.0000  *)
+    (* 'MatrixExp6:22' omgtheta = so3ToVec(se3mat(1: 3, 1: 3)); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+    (* Returns the corresponding 3-vector (angular velocity). *)
+    (* Example Input:  *)
+    
+    (* clear; clc; *)
+    (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+    (* omg = so3ToVec(so3mat)   *)
+    
+    (* Output: *)
+    (* omg = *)
+    (* 1 *)
+    (* 2 *)
+    (* 3 *)
+    (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+    omgtheta[0] := V[0];
+    omgtheta[1] := V[1];
+    omgtheta[2] := V[2];
+    (* 'MatrixExp6:23' if NearZero(norm(omgtheta)) *)
+    (* *** BASIC HELPER FUNCTIONS *** *)
+    (* Takes a scalar. *)
+    (* Checks if the scalar is small enough to be neglected. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* near = -1e-7; *)
+    (* judge = NearZero(near) *)
+    
+    (* Output: *)
+    (* judge = *)
+    (* 1 *)
+    (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+    c_theta := norm(x := omgtheta);
+    IF ABS(c_theta) < 1.0E-6 THEN 
+        (* 'MatrixExp6:24' T = [eye(3), se3mat(1: 3, 4); 0, 0, 0, 1]; *)
+        i0_eye();
+        tmp := i0_eye.I;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            a[R_tmp] := tmp[3 * Slist_tmp_0];
+            a[R_tmp + 1] := tmp[(3 * Slist_tmp_0) + 1];
+            a[R_tmp + 2] := tmp[(3 * Slist_tmp_0) + 2];
+            a[Slist_tmp_0 + 12] := se3mat[Slist_tmp_0 + 12];
+        END_FOR;
+        a[3] := 0.0;
+        a[7] := 0.0;
+        a[11] := 0.0;
+        a[15] := 1.0;
+    ELSE 
+        (* 'MatrixExp6:25' else *)
+        (* 'MatrixExp6:26' [omghat, theta] = AxisAng3(omgtheta); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes A 3-vector of exponential coordinates for rotation. *)
+        (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+        (* angle theta. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* expc3 = [1; 2; 3]; *)
+        (* [omghat, theta] = AxisAng3(expc3)   *)
+        
+        (* Output: *)
+        (* omghat = *)
+        (* 0.2673 *)
+        (* 0.5345 *)
+        (* 0.8018 *)
+        (* theta = *)
+        (* 3.7417 *)
+        (* 'AxisAng3:20' theta = norm(expc3); *)
+        (* 'AxisAng3:21' omghat = expc3 / theta; *)
+        (* 'MatrixExp6:27' omgmat = se3mat(1: 3, 1: 3) / theta; *)
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+            omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / c_theta;
+            omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / c_theta;
+            omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / c_theta;
+        END_FOR;
+        (* 'MatrixExp6:28' T = [MatrixExp3(se3mat(1: 3, 1: 3)), ... *)
+        (* 'MatrixExp6:29'          (eye(3) * theta + (1 - cos(theta)) * omgmat ... *)
+        (* 'MatrixExp6:30'           + (theta - sin(theta)) * omgmat * omgmat) ... *)
+        (* 'MatrixExp6:31'             * se3mat(1: 3, 4) / theta; *)
+        (* 'MatrixExp6:32'          0, 0, 0, 1]; *)
+        thetalist0_0 := 1.0 - COS(c_theta);
+        g_a := c_theta - SIN(c_theta);
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 so(3) representation of exponential coordinates. *)
+        (* Returns R in SO(3) that is achieved by rotating about omghat by theta  *)
+        (* from an initial orientation R = I. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* R = MatrixExp3(so3mat)   *)
+        
+        (* Output: *)
+        (* R = *)
+        (* -0.6949    0.7135    0.0893 *)
+        (* -0.1920   -0.3038    0.9332 *)
+        (* 0.6930    0.6313    0.3481 *)
+        (* 'MatrixExp3:18' omgtheta = so3ToVec(so3mat); *)
+        (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+        (* Takes a 3x3 skew-symmetric matrix (an element of so(3)). *)
+        (* Returns the corresponding 3-vector (angular velocity). *)
+        (* Example Input:  *)
+        
+        (* clear; clc; *)
+        (* so3mat = [[0, -3, 2]; [3, 0, -1]; [-2, 1, 0]]; *)
+        (* omg = so3ToVec(so3mat)   *)
+        
+        (* Output: *)
+        (* omg = *)
+        (* 1 *)
+        (* 2 *)
+        (* 3 *)
+        (* 'so3ToVec:17' omg = [so3mat(3, 2); so3mat(1, 3); so3mat(2, 1)]; *)
+        omgtheta[0] := V[0];
+        omgtheta[1] := V[1];
+        omgtheta[2] := V[2];
+        (* 'MatrixExp3:19' if NearZero(norm(omgtheta)) *)
+        (* *** BASIC HELPER FUNCTIONS *** *)
+        (* Takes a scalar. *)
+        (* Checks if the scalar is small enough to be neglected. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* near = -1e-7; *)
+        (* judge = NearZero(near) *)
+        
+        (* Output: *)
+        (* judge = *)
+        (* 1 *)
+        (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+        i_theta := norm(x := omgtheta);
+        IF ABS(i_theta) < 1.0E-6 THEN 
+            (* 'MatrixExp3:20' R = eye(3); *)
+            i0_eye();
+            b_R := i0_eye.I;
+        ELSE 
+            (* 'MatrixExp3:21' else *)
+            (* 'MatrixExp3:22' [omghat, theta] = AxisAng3(omgtheta); *)
+            (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+            (* Takes A 3-vector of exponential coordinates for rotation. *)
+            (* Returns the unit rotation axis omghat and the corresponding rotation  *)
+            (* angle theta. *)
+            (* Example Input: *)
+            
+            (* clear; clc; *)
+            (* expc3 = [1; 2; 3]; *)
+            (* [omghat, theta] = AxisAng3(expc3)   *)
+            
+            (* Output: *)
+            (* omghat = *)
+            (* 0.2673 *)
+            (* 0.5345 *)
+            (* 0.8018 *)
+            (* theta = *)
+            (* 3.7417 *)
+            (* 'AxisAng3:20' theta = norm(expc3); *)
+            (* 'AxisAng3:21' omghat = expc3 / theta; *)
+            (* 'MatrixExp3:23' omgmat = so3mat / theta; *)
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                omgmat_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+                b_omgmat[3 * Slist_tmp_0] := se3mat[omgmat_tmp] / i_theta;
+                b_omgmat[(3 * Slist_tmp_0) + 1] := se3mat[omgmat_tmp + 1] / i_theta;
+                b_omgmat[(3 * Slist_tmp_0) + 2] := se3mat[omgmat_tmp + 2] / i_theta;
+            END_FOR;
+            (* 'MatrixExp3:24' R = eye(3) + sin(theta) * omgmat + (1 - cos(theta)) * omgmat * omgmat; *)
+            l_a := SIN(i_theta);
+            x_tmp := COS(i_theta);
+            i0_eye();
+            tmp := i0_eye.I;
+            FOR Slist_tmp_0 := 0 TO 2 DO 
+                FOR omgmat_tmp := 0 TO 2 DO 
+                    R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                    b_R[R_tmp] := (((((1.0 - x_tmp) * b_omgmat[Slist_tmp_0 + 3]) * b_omgmat[(3 * omgmat_tmp) + 1]) + (((1.0 - x_tmp) * b_omgmat[Slist_tmp_0]) * b_omgmat[3 * omgmat_tmp])) + ((b_omgmat[Slist_tmp_0 + 6] * (1.0 - x_tmp)) * b_omgmat[(3 * omgmat_tmp) + 2])) + ((b_omgmat[R_tmp] * l_a) + tmp[R_tmp]);
+                END_FOR;
+            END_FOR;
+        END_IF;
+        FOR Slist_tmp_0 := 0 TO 2 DO 
+            l_a := 0.0;
+            FOR omgmat_tmp := 0 TO 2 DO 
+                R_tmp := (3 * omgmat_tmp) + Slist_tmp_0;
+                l_a := ((((((omgmat[Slist_tmp_0 + 3] * g_a) * omgmat[(3 * omgmat_tmp) + 1]) + ((g_a * omgmat[Slist_tmp_0]) * omgmat[3 * omgmat_tmp])) + ((omgmat[Slist_tmp_0 + 6] * g_a) * omgmat[(3 * omgmat_tmp) + 2])) + ((SINT_TO_LREAL(p_a[R_tmp]) * c_theta) + (omgmat[R_tmp] * thetalist0_0))) * se3mat[omgmat_tmp + 12]) + l_a;
+                a[omgmat_tmp + (Slist_tmp_0 * 4)] := b_R[(3 * Slist_tmp_0) + omgmat_tmp];
+            END_FOR;
+            a[Slist_tmp_0 + 12] := l_a / c_theta;
+        END_FOR;
+        a[3] := 0.0;
+        a[7] := 0.0;
+        a[11] := 0.0;
+        a[15] := 1.0;
+    END_IF;
+    FOR Slist_tmp_0 := 0 TO 3 DO 
+        FOR omgmat_tmp := 0 TO 3 DO 
+            R_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+            i := Slist_tmp_0 + R_tmp;
+            M[i] := 0.0;
+            M[i] := M[i] + (a[R_tmp] * T[Slist_tmp_0]);
+            M[i] := (a[R_tmp + 1] * T[Slist_tmp_0 + 4]) + M[i];
+            M[i] := (a[R_tmp + 2] * T[Slist_tmp_0 + 8]) + M[i];
+            M[i] := (a[R_tmp + 3] * T[Slist_tmp_0 + 12]) + M[i];
+        END_FOR;
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 15 DO 
+        T[Slist_tmp_0] := M[Slist_tmp_0];
+    END_FOR;
+    (* 'JacobianSpace:31' Js(:, i) = Adjoint(T) * Slist(:, i); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes T a transformation matrix SE3.  *)
+    (* Returns the corresponding 6x6 adjoint representation [AdT]. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* AdT = Adjoint(T) *)
+    
+    (* Output: *)
+    (* AdT = *)
+    (* 1     0     0     0     0     0 *)
+    (* 0     0    -1     0     0     0 *)
+    (* 0     1     0     0     0     0 *)
+    (* 0     0     3     1     0     0 *)
+    (* 3     0     0     0     0    -1 *)
+    (* 0     0     0     0     1     0 *)
+    (* 'Adjoint:20' [R, p] = TransToRp(T); *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes the transformation matrix T in SE(3)  *)
+    (* Returns R: the corresponding rotation matrix *)
+    (* p: the corresponding position vector . *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* T = [[1, 0, 0, 0]; [0, 0, -1, 0]; [0, 1, 0, 3]; [0, 0, 0, 1]]; *)
+    (* [R, p] = TransToRp(T) *)
+    
+    (* Output: *)
+    (* R = *)
+    (* 1     0     0 *)
+    (* 0     0    -1 *)
+    (* 0     1     0 *)
+    (* p = *)
+    (* 0 *)
+    (* 0 *)
+    (* 3 *)
+    (* 'TransToRp:22' R = T(1: 3, 1: 3); *)
+    (* 'TransToRp:23' p = T(1: 3, 4); *)
+    (* 'Adjoint:21' AdT = [R, zeros(3); VecToso3(p) * R, R]; *)
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3-vector (angular velocity). *)
+    (* Returns the skew symmetric matrix in so(3). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* omg = [1; 2; 3]; *)
+    (* so3mat = VecToso3(omg) *)
+    
+    (* Output: *)
+    (* so3mat = *)
+    (* 0    -3     2 *)
+    (* 3     0    -1 *)
+    (* -2     1     0 *)
+    (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+    tmp_0[3] :=  -T[14];
+    tmp_0[6] := T[13];
+    tmp_0[1] := T[14];
+    tmp_0[7] :=  -T[12];
+    tmp_0[2] :=  -T[13];
+    tmp_0[5] := T[12];
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        FOR omgmat_tmp := 0 TO 2 DO 
+            R_tmp := Slist_tmp_0 + (3 * omgmat_tmp);
+            tmp[R_tmp] := 0.0;
+            a_tmp_tmp := DWORD_TO_DINT(SHL(DINT_TO_DWORD(omgmat_tmp), 2));
+            tmp[R_tmp] := tmp[R_tmp] + (T[a_tmp_tmp] * tmp_0[Slist_tmp_0]);
+            tmp[R_tmp] := (T[a_tmp_tmp + 1] * tmp_0[Slist_tmp_0 + 3]) + tmp[R_tmp];
+            tmp[R_tmp] := (T[a_tmp_tmp + 2] * tmp_0[Slist_tmp_0 + 6]) + tmp[R_tmp];
+            T_0[omgmat_tmp + (6 * Slist_tmp_0)] := T[(Slist_tmp_0 * 4) + omgmat_tmp];
+            T_0[omgmat_tmp + (6 * (Slist_tmp_0 + 3))] := 0.0;
+        END_FOR;
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 2 DO 
+        T_0[(6 * Slist_tmp_0) + 3] := tmp[3 * Slist_tmp_0];
+        i := DWORD_TO_DINT(SHL(DINT_TO_DWORD(Slist_tmp_0), 2));
+        omgmat_tmp := 6 * (Slist_tmp_0 + 3);
+        T_0[omgmat_tmp + 3] := T[i];
+        T_0[(6 * Slist_tmp_0) + 4] := tmp[(3 * Slist_tmp_0) + 1];
+        T_0[omgmat_tmp + 4] := T[i + 1];
+        T_0[(6 * Slist_tmp_0) + 5] := tmp[(3 * Slist_tmp_0) + 2];
+        T_0[omgmat_tmp + 5] := T[i + 2];
+    END_FOR;
+    FOR Slist_tmp_0 := 0 TO 5 DO 
+        i := 6 * (b_i + 1);
+        R_tmp := Slist_tmp_0 + i;
+        J[R_tmp] := 0.0;
+        FOR omgmat_tmp := 0 TO 5 DO 
+            J[R_tmp] := (Tsb_0[i + omgmat_tmp] * T_0[(6 * omgmat_tmp) + Slist_tmp_0]) + J[R_tmp];
+        END_FOR;
+    END_FOR;
+END_FOR;
+(* Outport: '<Root>/q1' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function3' *)
+(* '<S1>:1:74' thetalistDot = pinv(J) * Vs; *)
+(* '<S1>:1:76' q1 = thetalist(1); *)
+(* '<S1>:1:77' q2 = thetalist(2); *)
+(* '<S1>:1:78' q3 = thetalist(3); *)
+(* '<S1>:1:79' q4Dot = thetalistDot(4); *)
+q1 := thetalist0[0];
+(* Outport: '<Root>/q2' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function3' *)
+q2 := thetalist0[1];
+(* Outport: '<Root>/q3' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function3' *)
+q3 := thetalist0[2];
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+i0_pinv_i(A := J);
+Tsb_0 := i0_pinv_i.X;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+V[0] := 0.0;
+V[1] := 0.0;
+V[2] := 0.0;
+V[3] := Vx;
+V[4] := Vy;
+V[5] := Vz;
+(* MATLAB Function: '<Root>/MATLAB Function3' *)
+FOR Slist_tmp_0 := 0 TO 5 DO 
+    tmp_2[Slist_tmp_0] := 0.0;
+    FOR omgmat_tmp := 0 TO 5 DO 
+        tmp_2[Slist_tmp_0] := (Tsb_0[(6 * omgmat_tmp) + Slist_tmp_0] * V[omgmat_tmp]) + tmp_2[Slist_tmp_0];
+    END_FOR;
+END_FOR;
+(* Outport: '<Root>/q4Dot' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function3' *)
+q4Dot := tmp_2[3];
+(* Outport: '<Root>/success' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function3' *)
+success :=  NOT err;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

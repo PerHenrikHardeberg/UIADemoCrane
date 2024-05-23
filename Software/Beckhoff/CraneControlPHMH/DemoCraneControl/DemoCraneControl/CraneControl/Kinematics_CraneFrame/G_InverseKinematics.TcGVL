@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_InverseKinematics" Id="{64159996-3342-42b4-9865-0a5dc597079d}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fvXref  : LREAL; // Toolpoint cartesian velocity. From joistick. Used for inv. vel kin and calculate path for pos controller
+	fvYref  : LREAL;
+	fvZref  : LREAL;
+	fq4Dotref : LREAL; //Actuator angular velocity from inverse vel kinematics m/s
+	f_q1_ref : LREAL; //Ref angles from inverse position kinematics radians
+	f_q2_ref : LREAL;
+	f_q3_ref : LREAL;
+	bKinematicsSucsessful : BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

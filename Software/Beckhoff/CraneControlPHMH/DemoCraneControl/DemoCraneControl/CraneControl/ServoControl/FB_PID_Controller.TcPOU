@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_PID_Controller" Id="{8ad72fbb-7680-4452-bd55-94ce8361bfdd}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PID_Controller
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	// Position Gains
+	Kp1 : LREAL;
+	Kp2 : LREAL;
+	Kp3 : LREAL;
+	Ki1 : LREAL;
+	Ki2 : LREAL;
+	Ki3 : LREAL;
+	Kd1 : LREAL;
+	Kd2 : LREAL;
+	Kd3 : LREAL;
+	
+	
+	
+	// FF GAINS
+	KF4 : LREAL;
+	FFPart4 : LREAL;
+	FFPart4_B : LREAL;
+
+	pid1 : FB_PID;
+	pid2 : FB_PID;
+	pid3 : FB_PID;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+KF4 := 0.05; // FF PART
+
+(*
+// Position Gains
+Kp1 := 5;
+Kp2 := 8;
+Kp3 := 6;
+Ki1 := 1;
+Ki2 := 1;
+Ki3 := 1;
+Kd1 := 0.05;
+Kd2 := 0.05;
+Kd3 := 0.05;
+*)
+
+Kp1 := 5;
+Kp2 := 8;
+Kp3 := 6;
+Ki1 := 1;
+Ki2 := 1;
+Ki3 := 1;
+Kd1 := 0.05;
+Kd2 := 0.05;
+Kd3 := 0.05;
+
+
+
+
+FFPart4 := KF4*G_Servo.fNormalizedActuatorVelFeedForward_q4Dot;
+
+
+
+// Favorizing return of the telescope
+IF FFPart4 <= 0 THEN
+	FFPart4_B := FFPart4*10;
+ELSE
+	FFPart4_B := FFPart4;
+END_IF
+
+
+G_Servo.f_u_q4 := FFPart4_B;    // FF
+
+
+// Closed loop control joint q1
+pid1(SetPoint :=  G_InverseKinematics.f_q1_ref,
+		SensorValue := G_SensorsScaled.q1,
+		Kp := Kp1,
+		Ki := Ki1,
+		Kd := Kd1,
+		MaxOutput := 1,
+		MinOutput := -1,
+		ResetIntegral := TRUE,
+		Output => G_Servo.f_u_q1);
+
+// Closed loop control joint q2
+pid2(SetPoint :=  G_InverseKinematics.f_q2_ref,
+		SensorValue := G_SensorsScaled.q2,
+		Kp := Kp2,
+		Ki := Ki2,
+		Kd := Kd2,
+		MaxOutput := 1,
+		MinOutput := -1,
+		ResetIntegral := TRUE,
+		Output => G_Servo.f_u_q2);
+		
+// Closed loop control joint q3		
+pid3(SetPoint :=  G_InverseKinematics.f_q3_ref,
+		SensorValue := G_SensorsScaled.q3,
+		Kp := Kp3,
+		Ki := Ki3,
+		Kd := Kd3,
+		MaxOutput := 1,
+		MinOutput := -1,
+		ResetIntegral := TRUE,
+		Output => G_Servo.f_u_q3);	
+		
+	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

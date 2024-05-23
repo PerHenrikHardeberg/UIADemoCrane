@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_ActuatorLimits" Id="{45549d47-85cc-4d36-b448-9ea6fa9790d0}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_ActuatorLimits
+VAR
+	fbActuatorLimitsq1 : FB_ActuatorLimits;
+	fbActuatorLimitsq2 : FB_ActuatorLimits;
+	fbActuatorLimitsq3 : FB_ActuatorLimits;
+	fbActuatorLimitsq4 : FB_ActuatorLimits;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbActuatorLimitsq1(fsensorMinValue := G_ActuatorLimits.fq1Min,
+					fsensorMaxValue := G_ActuatorLimits.fq1Max,
+					fSensorSignal := G_SensorsScaled.q1,
+					fServoSignalIn := G_Servo.f_u_q1,
+					bMinReached => G_ActuatorLimits.bq1Min,
+					bMaxReached => G_ActuatorLimits.bq1Max,
+					fServoSignalOut => G_Servo.f_u_q1);
+
+
+fbActuatorLimitsq2(fsensorMinValue := G_ActuatorLimits.fq2Min,
+					fsensorMaxValue := G_ActuatorLimits.fq2Max,
+					fSensorSignal := G_SensorsScaled.q2,
+					fServoSignalIn := G_Servo.f_u_q2,
+					bMinReached => G_ActuatorLimits.bq2Min,
+					bMaxReached => G_ActuatorLimits.bq2Max,
+					fServoSignalOut => G_Servo.f_u_q2);
+					
+					
+fbActuatorLimitsq3(fsensorMinValue := G_ActuatorLimits.fq3Min,
+					fsensorMaxValue := G_ActuatorLimits.fq3Max,
+					fSensorSignal := G_SensorsScaled.q3,
+					fServoSignalIn := G_Servo.f_u_q3,
+					bMinReached => G_ActuatorLimits.bq3Min,
+					bMaxReached => G_ActuatorLimits.bq3Max,
+					fServoSignalOut => G_Servo.f_u_q3);
+					
+fbActuatorLimitsq4(fsensorMinValue := G_ActuatorLimits.fq4Min,
+					fsensorMaxValue := G_ActuatorLimits.fq4Max,
+					fSensorSignal := G_SensorsScaled.q4,
+					fServoSignalIn := G_Servo.f_u_q4,
+					bMinReached => G_ActuatorLimits.bq4Min,
+					bMaxReached => G_ActuatorLimits.bq4Max,
+					fServoSignalOut => G_Servo.f_u_q4);
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

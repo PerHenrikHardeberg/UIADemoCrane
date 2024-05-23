@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_ModeControl" Id="{49ad9757-e002-4e01-8b6b-009cac1508a6}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_ModeControl
+VAR
+	bAllowSinusInManualMode : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// ONLY SET TRUE FOR ACTUATOR TEST IN MANUAL MODE:
+bAllowSinusInManualMode := FALSE;
+
+
+
+P_SensorScaling(); // Scaling sensor signals to mach q1,q2,q3,q4
+P_Kinematics(); // Toolpoint position based on joint angles
+P_JoystickInput(); // Normalize joistick signals from raw to -1 to 1
+
+
+IF G_Buttons.bManualModeSelector AND NOT(G_Buttons.bAutoModeSelector) THEN // Manual mode
+	
+	//Only for actuationg the joints with open loop sinus
+	IF G_Servo.bSinusActive AND bAllowSinusInManualMode THEN
+		P_ManualActuatorTest();
+	ELSE
+		P_ManualControl();
+	END_IF
+	
+	
+	
+	P_ActuatorLimits(); // Checking sensors and light lamps in HMI, preventing crashes is ONLY in auto mode
+ELSIF NOT(G_Buttons.bManualModeSelector) AND G_Buttons.bAutoModeSelector AND NOT(G_SensorInput.bSensorDataLost) THEN // Auto Mode
+	// Choose joystick OR PathGeneration
+
+	IF G_Path.bPathActivated THEN
+		//P_PathGeneration_1();  // 4 DOF
+		P_PathGeneration_2();  // 4 DOF (3 dof test different telescope)
+		//P_PathGeneration();  // 3 DOF
+	ELSE
+		P_CartesianVelFromJoystick();		
+	END_IF
+
+	
+	P_CartesianLimit(); // Stops velocity ref if outside boundaries
+
+
+	IF G_Heave.bHeaveEnable THEN
+		P_Heave();
+		G_Heave.bHeaveActive := TRUE;
+	ELSE
+		G_Heave.bHeaveActive := FALSE;
+		P_VelToPos(); //Integrates pos to vel if 
+	END_IF
+	
+	P_CartesianController();
+ELSE // ModeButton in zero position
+	P_Idle();
+	P_SetZero();
+	G_Heave.bHeaveActive := FALSE;
+END_IF
+
+
+P_Outputs(); //Lights on control box
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_DistSensorValue2Distance_q4" Id="{368dc91e-d07f-4caf-ac08-bcd8f13fda95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DistSensorValue2Distance_q4
+VAR_INPUT
+	fSensorValue : REAL;
+END_VAR
+VAR_OUTPUT
+	f_q4 : REAL;
+END_VAR
+VAR
+DistSensorVal : REAL := 190; //mm
+//Meassured value (Can be ecalibrated by looking in G_SensorInput and reading min and max telescope dist):
+DistSensorMin : REAL  := 8.5; //mm
+DistSensorMax : REAL := 193; //mm
+ 
+q4Min : REAL := 167.25; //Maching with physical measurement 
+q4Max : REAL := 367.25;//200 mm work space
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[f_q4 :=  ((fSensorValue-DistSensorMin)/(DistSensorMax-DistSensorMin)*(q4Max-q4Min))/1000;//m]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

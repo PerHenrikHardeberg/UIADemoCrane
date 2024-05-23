@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ActuatorLimits" Id="{56664bad-acc1-43bd-9ddb-dec265e97858}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ActuatorLimits
+VAR_INPUT
+	fsensorMinValue : LREAL; //Sensor value at minimum actuator pos. OBS: G_Sensorscaled AFTER calibrating sensors!!!!!!
+	fsensorMaxValue : LREAL; //Sensor value at minimum actuator pos. OBS: G_Sensorscaled AFTER calibrating sensors!!!!!!
+	fSensorSignal : LREAL;
+	fServoSignalIn : LREAL; // Signal out from controller. go trough this to prevent from running to end stop
+END_VAR
+VAR_OUTPUT
+	bMinReached : BOOL;
+	bMaxReached : BOOL;
+	fServoSignalOut : LREAL;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF fSensorSignal <= fsensorMinValue THEN
+	bMinReached := TRUE;
+	// Peventing from running in wrong direction when closee to end stop:
+	IF fServoSignalIn <= 0 THEN
+		fServoSignalOut := 0;
+	ELSE
+		fServoSignalOut := fServoSignalIn;
+	END_IF
+ELSIF fSensorSignal >= fsensorMaxValue THEN
+	bMaxReached := TRUE;
+	// Peventing from running in wrong direction when closee to end stop:
+	IF fServoSignalIn >= 0 THEN
+		fServoSignalOut := 0;
+	ELSE
+		fServoSignalOut := fServoSignalIn;
+	END_IF
+ELSE
+	bMinReached := FALSE;
+	bMaxReached := FALSE;
+	fServoSignalOut := fServoSignalIn;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

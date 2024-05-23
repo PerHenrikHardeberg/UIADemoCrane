@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_JoystickInputScaling" Id="{36e5660e-0323-4eae-9811-27a03c0e902d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_JoystickInputScaling
+VAR_INPUT
+	bEnable  : BOOL;
+	nRawInput : INT;
+	stJoystickInputScaling : ST_JoystickInputScaling;
+END_VAR
+VAR_OUTPUT
+	fNormalizedOutput : LREAL;
+END_VAR
+VAR
+	fRawInput : LREAL;
+	fTempInput : LREAL;
+	fTempOutput : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fRawInput := INT_TO_REAL(nRawInput);
+
+fTempInput := fRawInput - stJoystickInputScaling.fNeutralInputValue;
+IF fTempInput > stJoystickInputScaling.fNeutralDeadband THEN
+	fTempOutput := fTempInput/(stJoystickInputScaling.fMaxInputValue - stJoystickInputScaling.fNeutralInputValue);
+ELSIF fTempInput < -stJoystickInputScaling.fNeutralDeadband THEN
+	fTempOutput := fTempInput/(stJoystickInputScaling.fNeutralInputValue - stJoystickInputScaling.fMinInputValue);
+ELSE
+	fTempOutput := 0;
+END_IF
+
+IF nRawInput = 0 THEN
+	fNormalizedOutput := -0.0;
+ELSIF NOT (bEnable) THEN
+	fNormalizedOutput := -0.0;
+ELSE 
+	fNormalizedOutput := LIMIT(stJoystickInputScaling.fMinOutputValue, fTempOutput, stJoystickInputScaling.fMaxOutputValue);
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

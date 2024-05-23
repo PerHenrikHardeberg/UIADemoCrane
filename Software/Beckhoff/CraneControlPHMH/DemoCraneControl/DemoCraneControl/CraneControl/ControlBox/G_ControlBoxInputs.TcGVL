@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_ControlBoxInputs" Id="{ee33d3cb-b54d-4b69-9b14-efb6720793f7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	bManualModeSelector			AT %I* : BOOL;
+	bAutoModeSelector			AT %I* : BOOL;
+	bRedButton					AT %I* : BOOL;
+	bGreenButton				AT %I* : BOOL;
+	bJoystickLeftEnable			AT %I* : BOOL;
+	bJoystickRightEnable		AT %I* : BOOL;
+	bSafetyRelayRestartButton   AT %I* : BOOL;
+	
+	// Analog Inputs
+	stJoyLX 					: ST_AnalogInput;
+	stJoyLY						: ST_AnalogInput;
+	stJoyRX 					: ST_AnalogInput;
+	stJoyRY						: ST_AnalogInput;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

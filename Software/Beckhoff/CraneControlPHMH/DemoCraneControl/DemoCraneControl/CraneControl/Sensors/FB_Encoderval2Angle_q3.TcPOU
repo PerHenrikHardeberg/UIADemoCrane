@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Encoderval2Angle_q3" Id="{94297439-6ef3-4b64-a052-1c1ad9188b4c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Encoderval2Angle_q3
+VAR_INPUT
+	theta_i: REAL;
+END_VAR
+VAR_OUTPUT
+	q3: REAL;
+END_VAR
+VAR_TEMP
+	ll: REAL;
+	a: REAL;
+	q3_tmp: REAL;
+	temp1: REAL;
+	temp2: REAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* MATLAB Function: '<Root>/MATLAB Function' *)
+(* Validated with physical measurements on crane from 0 - 180 deg *)
+(* MATLAB Function 'MATLAB Function': '<S1>:1' *)
+(* Constant Leght all mm: *)
+(* '<S1>:1:6' theta_i_init = 2.3527; *)
+(* start angle when piston is fully extracted *)
+(* '<S1>:1:7' theta_k_init = 3.9706; *)
+(* start angle when piston is fully extracted *)
+(* '<S1>:1:8' Theta_I = theta_i_init + theta_i; *)
+(* '<S1>:1:10' lh = 116.62; *)
+(* '<S1>:1:11' li = 121.93; *)
+(* '<S1>:1:12' lj = 13.34; *)
+(* '<S1>:1:13' lk = 30; *)
+(* '<S1>:1:14' lm = 20; *)
+(* '<S1>:1:15' ln = 16; *)
+(* '<S1>:1:16' theta_h = real(acos((lh^2+lj^2-li^2)/(2*lh*lj))); *)
+(* Based on input: *)
+(* Cylinder lenght: *)
+(* '<S1>:1:20' xk = sqrt(lh^2+lk^2-2*lh*lk*cos(Theta_I)); *)
+
+// PHMH ADDED BECAUSE BUNCTION DOES NOT HANDLE POSITIVE VALUES. Posistive values not possible after caluibration
+IF theta_i >= 0 THEN
+	theta_i := -0.00001;
+ELSIF theta_i <= -1.5 THEN
+	theta_i := -1.5;
+END_IF
+
+
+
+
+temp1 := COS(theta_i + 2.3527);
+IF ABS(temp1) > 1 THEN
+	temp1 := 1;
+END_IF
+
+
+
+a := SQRT(14500.224400000001 - (temp1 * 6997.2000000000007));
+(* '<S1>:1:22' theta_j = theta_h-Theta_I; *)
+(* '<S1>:1:23' ll = sqrt(lj^2+lk^2-2*lj*lk*cos(theta_j)); *)
+temp2 := COS(1.9282807448254589 - (theta_i + 2.3527));
+ll := SQRT(1077.9556 - (temp2 * 800.4));
+(* '<S1>:1:25' theta_n = real(acos((ll^2+ln^2-lm^2)/(2*ll*ln))); *)
+(* '<S1>:1:26' theta_l = acos((li^2+ll^2-xk^2)/(2*li*ll)); *)
+(* '<S1>:1:27' theta_k = theta_n + theta_l; *)
+(* '<S1>:1:28' q3 = theta_k-theta_k_init; *)
+(* - init so output start at 0 *)
+q3_tmp := ll * ll;
+(* Outport: '<Root>/q3' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function' *)
+q3 := -((ACOS(((q3_tmp + 256.0) - 400.0) / ((2.0 * ll) * 16.0)) + ACOS(((q3_tmp + 14866.924900000002) - (a * a)) / (243.86 * ll))) - 3.9706);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="svd_e" Id="{d743c661-90d7-4d37-878b-250887d96981}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK svd_e
+VAR_INPUT
+    A: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR_OUTPUT
+    U: ARRAY [0..35] OF LREAL;
+    b_s: ARRAY [0..5] OF LREAL;
+    V: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR
+    i0_xrot_c5: xrot_c5;
+    i0_xrotg: xrotg;
+    i0_xswap_gs: xswap_gs;
+    i0_xscal_fiz1t4: xscal_fiz1t4;
+    i0_xaxpy_dmyz: xaxpy_dmyz;
+    i0_xaxpy_dmyzr: xaxpy_dmyzr;
+    i0_xaxpy_dmyzr5: xaxpy_dmyzr5;
+    i0_xscal_fiz1t: xscal_fiz1t;
+    i0_xscal_fiz1: xscal_fiz1;
+END_VAR
+VAR_TEMP
+    b_A: ARRAY [0..35] OF LREAL;
+    b_b_s: ARRAY [0..5] OF LREAL;
+    e: ARRAY [0..5] OF LREAL;
+    work: ARRAY [0..5] OF LREAL;
+    Vf: ARRAY [0..35] OF LREAL;
+    qq: DINT;
+    apply_transform: BOOL;
+    nrm: LREAL;
+    qjj: DINT;
+    qp1jj: DINT;
+    m: DINT;
+    qp1q: DINT;
+    rt: LREAL;
+    ztest: LREAL;
+    smm1: LREAL;
+    emm1: LREAL;
+    sqds: LREAL;
+    shift: LREAL;
+    k_ii: DINT;
+    exitg1: DINT;
+    temp16: LREAL;
+    temp17: LREAL;
+    temp18: LREAL;
+    temp19: LREAL;
+    temp20: LREAL;
+    temp21: LREAL;
+    temp22: LREAL;
+    temp23: LREAL;
+    temp24: LREAL;
+    temp25: LREAL;
+    temp26: LREAL;
+    temp27: LREAL;
+    temp28: LREAL;
+    temp29: LREAL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR m := 0 TO 35 DO 
+    b_A[m] := A[m];
+END_FOR;
+FOR m := 0 TO 5 DO 
+    b_b_s[m] := 0.0;
+    e[m] := 0.0;
+    work[m] := 0.0;
+END_FOR;
+FOR m := 0 TO 35 DO 
+    U[m] := 0.0;
+    Vf[m] := 0.0;
+END_FOR;
+FOR m := 0 TO 4 DO 
+    qq := (6 * m) + m;
+    apply_transform := FALSE;
+    nrm := xnrm2_l4(b_n := 6 - m, x := b_A, ix0 := qq + 1);
+    IF nrm > 0.0 THEN 
+        apply_transform := TRUE;
+        IF b_A[qq] < 0.0 THEN 
+            b_b_s[m] :=  -nrm;
+        ELSE 
+            b_b_s[m] := nrm;
+        END_IF;
+        IF ABS(b_b_s[m]) >= 1.0020841800044864E-292 THEN 
+            i0_xscal_fiz1(b_n := 6 - m, a := 1.0 / b_b_s[m], x := b_A, ix0 := qq + 1);
+        ELSE 
+            qp1q := (qq - m) + 6;
+            qjj := qq;
+            WHILE (qjj + 1) <= qp1q DO
+                b_A[qjj] := b_A[qjj] / b_b_s[m];
+                qjj := qjj + 1;
+            END_WHILE;
+        END_IF;
+        b_A[qq] := b_A[qq] + 1.0;
+        b_b_s[m] :=  -b_b_s[m];
+    ELSE 
+        b_b_s[m] := 0.0;
+    END_IF;
+    qp1q := m + 1;
+    WHILE (qp1q + 1) < 7 DO
+        qjj := (6 * qp1q) + m;
+        IF apply_transform THEN 
+            temp16 := xdotc_iq(b_n := 6 - m, x := b_A, ix0 := qq + 1, y := b_A, iy0 := qjj + 1);
+            i0_xaxpy_dmyz(b_n := 6 - m, a :=  -(temp16 / b_A[m + (6 * m)]), ix0 := qq + 1, y := b_A, iy0 := qjj + 1);
+        END_IF;
+        e[qp1q] := b_A[qjj];
+        qp1q := qp1q + 1;
+    END_WHILE;
+    qq := m;
+    WHILE (qq + 1) < 7 DO
+        U[qq + (6 * m)] := b_A[(6 * m) + qq];
+        qq := qq + 1;
+    END_WHILE;
+    IF (m + 1) <= 4 THEN 
+        nrm := xnrm2_l4b(b_n := 5 - m, x := e, ix0 := m + 2);
+        IF nrm = 0.0 THEN 
+            e[m] := 0.0;
+        ELSE 
+            IF e[m + 1] < 0.0 THEN 
+                e[m] :=  -nrm;
+            ELSE 
+                e[m] := nrm;
+            END_IF;
+            nrm := e[m];
+            IF ABS(e[m]) >= 1.0020841800044864E-292 THEN 
+                i0_xscal_fiz1t(b_n := 5 - m, a := 1.0 / e[m], x := e, ix0 := m + 2);
+            ELSE 
+                qq := m + 1;
+                WHILE (qq + 1) <= 6 DO
+                    e[qq] := e[qq] / nrm;
+                    qq := qq + 1;
+                END_WHILE;
+            END_IF;
+            e[m + 1] := e[m + 1] + 1.0;
+            e[m] :=  -e[m];
+            qq := m + 1;
+            WHILE (qq + 1) < 7 DO
+                work[qq] := 0.0;
+                qq := qq + 1;
+            END_WHILE;
+            qq := m + 1;
+            WHILE (qq + 1) < 7 DO
+                i0_xaxpy_dmyzr(b_n := 5 - m, a := e[qq], x := b_A, ix0 := (m + (6 * qq)) + 2, y := work, iy0 := m + 2);
+                qq := qq + 1;
+            END_WHILE;
+            qq := m + 1;
+            WHILE (qq + 1) < 7 DO
+                i0_xaxpy_dmyzr5(b_n := 5 - m, a := ( -e[qq]) / e[m + 1], x := work, ix0 := m + 2, y := b_A, iy0 := (m + (6 * qq)) + 2);
+                qq := qq + 1;
+            END_WHILE;
+        END_IF;
+        qq := m + 1;
+        WHILE (qq + 1) < 7 DO
+            Vf[qq + (6 * m)] := e[qq];
+            qq := qq + 1;
+        END_WHILE;
+    END_IF;
+END_FOR;
+m := 4;
+b_b_s[5] := b_A[35];
+e[4] := b_A[34];
+e[5] := 0.0;
+FOR qq := 0 TO 5 DO 
+    U[qq + 30] := 0.0;
+END_FOR;
+U[35] := 1.0;
+FOR qp1q := 4 TO 0 BY -1 DO 
+    qq := (6 * qp1q) + qp1q;
+    IF b_b_s[qp1q] <> 0.0 THEN 
+        qp1jj := qp1q + 1;
+        WHILE (qp1jj + 1) < 7 DO
+            qjj := ((6 * qp1jj) + qp1q) + 1;
+            temp17 := xdotc_iq(b_n := 6 - qp1q, x := U, ix0 := qq + 1, y := U, iy0 := qjj);
+            i0_xaxpy_dmyz(b_n := 6 - qp1q, a :=  -(temp17 / U[qq]), ix0 := qq + 1, y := U, iy0 := qjj);
+            qp1jj := qp1jj + 1;
+        END_WHILE;
+        qjj := qp1q;
+        WHILE (qjj + 1) < 7 DO
+            qp1jj := (6 * qp1q) + qjj;
+            U[qp1jj] :=  -U[qp1jj];
+            qjj := qjj + 1;
+        END_WHILE;
+        U[qq] := U[qq] + 1.0;
+        qq := 0;
+        WHILE qq <= (qp1q - 1) DO
+            U[qq + (6 * qp1q)] := 0.0;
+            qq := qq + 1;
+        END_WHILE;
+    ELSE 
+        FOR qjj := 0 TO 5 DO 
+            U[qjj + (6 * qp1q)] := 0.0;
+        END_FOR;
+        U[qq] := 1.0;
+    END_IF;
+END_FOR;
+FOR qq := 5 TO 0 BY -1 DO 
+    IF (qq + 1) <= 4 THEN 
+        IF e[qq] <> 0.0 THEN 
+            qp1q := ((6 * qq) + qq) + 2;
+            qjj := qq + 1;
+            WHILE (qjj + 1) < 7 DO
+                qp1jj := ((6 * qjj) + qq) + 2;
+                temp18 := xdotc_iq(b_n := 5 - qq, x := Vf, ix0 := qp1q, y := Vf, iy0 := qp1jj);
+                i0_xaxpy_dmyz(b_n := 5 - qq, a :=  -(temp18 / Vf[qp1q - 1]), ix0 := qp1q, y := Vf, iy0 := qp1jj);
+                qjj := qjj + 1;
+            END_WHILE;
+        END_IF;
+    END_IF;
+    FOR qp1q := 0 TO 5 DO 
+        Vf[qp1q + (6 * qq)] := 0.0;
+    END_FOR;
+    Vf[qq + (6 * qq)] := 1.0;
+END_FOR;
+FOR qq := 0 TO 5 DO 
+    ztest := e[qq];
+    IF b_b_s[qq] <> 0.0 THEN 
+        rt := ABS(b_b_s[qq]);
+        nrm := b_b_s[qq] / rt;
+        b_b_s[qq] := rt;
+        IF (qq + 1) < 6 THEN 
+            ztest := ztest / nrm;
+        END_IF;
+        i0_xscal_fiz1t4(a := nrm, x := U, ix0 := (6 * qq) + 1);
+    END_IF;
+    IF (qq + 1) < 6 THEN 
+        IF ztest <> 0.0 THEN 
+            rt := ABS(ztest);
+            nrm := rt / ztest;
+            ztest := rt;
+            b_b_s[qq + 1] := b_b_s[qq + 1] * nrm;
+            i0_xscal_fiz1t4(a := nrm, x := Vf, ix0 := (6 * (qq + 1)) + 1);
+        END_IF;
+    END_IF;
+    e[qq] := ztest;
+END_FOR;
+qq := 0;
+nrm := 0.0;
+FOR qp1q := 0 TO 5 DO 
+    temp19 := ABS(b_b_s[qp1q]);
+    temp20 := ABS(e[qp1q]);
+    temp21 := MAX(temp19, temp20);
+    nrm := MAX(nrm, temp21);
+END_FOR;
+WHILE ((m + 2) > 0) AND (qq < 75) DO
+    qp1jj := m + 1;
+    REPEAT 
+        exitg1 := 0;
+        qp1q := qp1jj;
+        IF qp1jj = 0 THEN 
+            exitg1 := 1;
+        ELSE 
+            rt := ABS(e[qp1jj - 1]);
+            IF rt <= ((ABS(b_b_s[qp1jj - 1]) + ABS(b_b_s[qp1jj])) * 2.2204460492503131E-16) THEN 
+                e[qp1jj - 1] := 0.0;
+                exitg1 := 1;
+            ELSIF (rt <= 1.0020841800044864E-292) OR ((qq > 20) AND (rt <= (2.2204460492503131E-16 * nrm))) THEN 
+                e[qp1jj - 1] := 0.0;
+                exitg1 := 1;
+            ELSE 
+                qp1jj := qp1jj - 1;
+            END_IF;
+        END_IF;
+    UNTIL NOT(exitg1 = 0)
+    END_REPEAT;
+    IF (m + 1) = qp1jj THEN 
+        qp1jj := 4;
+    ELSE 
+        qjj := m + 2;
+        k_ii := m + 2;
+        REPEAT 
+            exitg1 := 0;
+            IF k_ii >= qp1jj THEN 
+                qjj := k_ii;
+                IF k_ii = qp1jj THEN 
+                    exitg1 := 1;
+                ELSE 
+                    rt := 0.0;
+                    IF k_ii < (m + 2) THEN 
+                        rt := ABS(e[k_ii - 1]);
+                    END_IF;
+                    IF k_ii > (qp1jj + 1) THEN 
+                        rt := ABS(e[k_ii - 2]) + rt;
+                    END_IF;
+                    ztest := ABS(b_b_s[k_ii - 1]);
+                    IF (ztest <= (2.2204460492503131E-16 * rt)) OR (ztest <= 1.0020841800044864E-292) THEN 
+                        b_b_s[k_ii - 1] := 0.0;
+                        exitg1 := 1;
+                    ELSE 
+                        k_ii := k_ii - 1;
+                    END_IF;
+                END_IF;
+            ELSE 
+                exitg1 := 1;
+            END_IF;
+        UNTIL NOT(exitg1 = 0)
+        END_REPEAT;
+        IF qjj = qp1jj THEN 
+            qp1jj := 3;
+        ELSIF (m + 2) = qjj THEN 
+            qp1jj := 1;
+        ELSE 
+            qp1jj := 2;
+            qp1q := qjj;
+        END_IF;
+    END_IF;
+    CASE qp1jj OF
+        1: 
+            rt := e[m];
+            e[m] := 0.0;
+            qjj := m;
+            WHILE (qjj + 1) >= (qp1q + 1) DO
+                i0_xrotg(a := b_b_s[qjj], b := rt);
+                ztest := i0_xrotg.c;
+                sqds := i0_xrotg.b_s;
+                IF (qjj + 1) > (qp1q + 1) THEN 
+                    emm1 := e[qjj - 1];
+                    rt := emm1 * ( -sqds);
+                    e[qjj - 1] := emm1 * ztest;
+                END_IF;
+                i0_xrot_c5(x := Vf, ix0 := (6 * qjj) + 1, iy0 := (6 * (m + 1)) + 1, c := ztest, b_s := sqds);
+                qjj := qjj - 1;
+            END_WHILE;
+        2: 
+            rt := e[qp1q - 1];
+            e[qp1q - 1] := 0.0;
+            qjj := qp1q;
+            WHILE (qjj + 1) <= (m + 2) DO
+                i0_xrotg(a := b_b_s[qjj], b := rt);
+                ztest := i0_xrotg.c;
+                sqds := i0_xrotg.b_s;
+                rt := ( -sqds) * e[qjj];
+                e[qjj] := e[qjj] * ztest;
+                i0_xrot_c5(x := U, ix0 := (6 * qjj) + 1, iy0 := (6 * (qp1q - 1)) + 1, c := ztest, b_s := sqds);
+                qjj := qjj + 1;
+            END_WHILE;
+        3: 
+            rt := b_b_s[m + 1];
+            temp22 := ABS(rt);
+            temp23 := ABS(b_b_s[m]);
+            temp24 := MAX(temp22, temp23);
+            temp25 := ABS(e[m]);
+            temp26 := MAX(temp24, temp25);
+            temp27 := ABS(b_b_s[qp1q]);
+            temp28 := MAX(temp26, temp27);
+            temp29 := ABS(e[qp1q]);
+            ztest := MAX(temp28, temp29);
+            rt := rt / ztest;
+            smm1 := b_b_s[m] / ztest;
+            emm1 := e[m] / ztest;
+            sqds := b_b_s[qp1q] / ztest;
+            smm1 := (((smm1 + rt) * (smm1 - rt)) + (emm1 * emm1)) / 2.0;
+            emm1 := rt * emm1;
+            emm1 := emm1 * emm1;
+            IF (smm1 <> 0.0) OR (emm1 <> 0.0) THEN 
+                shift := SQRT((smm1 * smm1) + emm1);
+                IF smm1 < 0.0 THEN 
+                    shift :=  -shift;
+                END_IF;
+                shift := emm1 / (smm1 + shift);
+            ELSE 
+                shift := 0.0;
+            END_IF;
+            rt := ((sqds + rt) * (sqds - rt)) + shift;
+            ztest := (e[qp1q] / ztest) * sqds;
+            qjj := qp1q + 1;
+            WHILE qjj <= (m + 1) DO
+                i0_xrotg(a := rt, b := ztest);
+                sqds := i0_xrotg.c;
+                smm1 := i0_xrotg.b_s;
+                IF qjj > (qp1q + 1) THEN 
+                    e[qjj - 2] := rt;
+                END_IF;
+                emm1 := e[qjj - 1];
+                rt := b_b_s[qjj - 1];
+                e[qjj - 1] := (emm1 * sqds) - (rt * smm1);
+                ztest := smm1 * b_b_s[qjj];
+                b_b_s[qjj] := b_b_s[qjj] * sqds;
+                i0_xrot_c5(x := Vf, ix0 := (6 * (qjj - 1)) + 1, iy0 := (6 * qjj) + 1, c := sqds, b_s := smm1);
+                b_b_s[qjj - 1] := (rt * sqds) + (emm1 * smm1);
+                i0_xrotg(a := b_b_s[qjj - 1], b := ztest);
+                sqds := i0_xrotg.c;
+                smm1 := i0_xrotg.b_s;
+                rt := (e[qjj - 1] * sqds) + (smm1 * b_b_s[qjj]);
+                b_b_s[qjj] := (e[qjj - 1] * ( -smm1)) + (sqds * b_b_s[qjj]);
+                ztest := smm1 * e[qjj];
+                e[qjj] := e[qjj] * sqds;
+                i0_xrot_c5(x := U, ix0 := (6 * (qjj - 1)) + 1, iy0 := (6 * qjj) + 1, c := sqds, b_s := smm1);
+                qjj := qjj + 1;
+            END_WHILE;
+            e[m] := rt;
+            qq := qq + 1;
+        ELSE
+            IF b_b_s[qp1q] < 0.0 THEN 
+                b_b_s[qp1q] :=  -b_b_s[qp1q];
+                i0_xscal_fiz1t4(a := -1.0, x := Vf, ix0 := (6 * qp1q) + 1);
+            END_IF;
+            qq := qp1q + 1;
+            REPEAT 
+                exitg1 := 0;
+                IF (qp1q + 1) < 6 THEN 
+                    IF b_b_s[qp1q] < b_b_s[qq] THEN 
+                        rt := b_b_s[qp1q];
+                        b_b_s[qp1q] := b_b_s[qq];
+                        b_b_s[qq] := rt;
+                        i0_xswap_gs(x := Vf, ix0 := (6 * qp1q) + 1, iy0 := (6 * (qp1q + 1)) + 1);
+                        i0_xswap_gs(x := U, ix0 := (6 * qp1q) + 1, iy0 := (6 * (qp1q + 1)) + 1);
+                        qp1q := qq;
+                        qq := qq + 1;
+                    ELSE 
+                        exitg1 := 1;
+                    END_IF;
+                ELSE 
+                    exitg1 := 1;
+                END_IF;
+            UNTIL NOT(exitg1 = 0)
+            END_REPEAT;
+            qq := 0;
+            m := m - 1;
+    END_CASE;
+END_WHILE;
+FOR m := 0 TO 5 DO 
+    b_s[m] := b_b_s[m];
+    FOR qq := 0 TO 5 DO 
+        V[qq + (6 * m)] := Vf[(6 * m) + qq];
+    END_FOR;
+END_FOR;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

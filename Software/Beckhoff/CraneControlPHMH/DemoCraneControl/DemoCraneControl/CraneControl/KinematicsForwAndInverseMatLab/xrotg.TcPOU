@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="xrotg" Id="{31da8c12-0ec7-4edf-8fd4-aac48a78e1f3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK xrotg
+VAR_OUTPUT
+    c: LREAL;
+    b_s: LREAL;
+END_VAR
+VAR_IN_OUT
+    a: LREAL;
+    b: LREAL;
+END_VAR
+VAR_TEMP
+    roe: LREAL;
+    absa: LREAL;
+    absb: LREAL;
+    scale: LREAL;
+    ads: LREAL;
+    bds: LREAL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[roe := b;
+absa := ABS(a);
+absb := ABS(b);
+IF absa > absb THEN 
+    roe := a;
+END_IF;
+scale := absa + absb;
+IF scale = 0.0 THEN 
+    b_s := 0.0;
+    c := 1.0;
+    a := 0.0;
+    b := 0.0;
+ELSE 
+    ads := absa / scale;
+    bds := absb / scale;
+    scale := SQRT((ads * ads) + (bds * bds)) * scale;
+    IF roe < 0.0 THEN 
+        scale :=  -scale;
+    END_IF;
+    c := a / scale;
+    b_s := b / scale;
+    IF absa > absb THEN 
+        b := b_s;
+    ELSIF c <> 0.0 THEN 
+        b := 1.0 / c;
+    ELSE 
+        b := 1.0;
+    END_IF;
+    a := scale;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

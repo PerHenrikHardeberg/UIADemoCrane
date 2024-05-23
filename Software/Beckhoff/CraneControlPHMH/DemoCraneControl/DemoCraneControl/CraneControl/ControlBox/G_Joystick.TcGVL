@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_Joystick" Id="{c722b76a-a2a7-461a-a024-0641a38117f7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fJoystickLeftNormalizedY 		: LREAL;
+	fJoystickLeftNormalizedX 		: LREAL;	
+	fJoystickRightNormalizedY 		: LREAL;
+	fJoystickRightNormalizedX 		: LREAL;
+	
+	nJoystickLeftDirectionX 		: DINT;
+	nJoystickLeftDirectionY 		: DINT;
+	nJoystickRightDirectionX 		: DINT;
+	nJoystickRightDirectionY 		: DINT;
+	
+	bJoystick1InUse : BOOL ;
+	bJoystick2InUse : BOOL;
+	bJoystick3InUse : BOOL;
+	bJoystick4InUse : BOOL;
+		
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

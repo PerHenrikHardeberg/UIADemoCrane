@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="NormToPulseLenght" Id="{f520fa35-90b6-4c10-959a-8e3218c3a429}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION NormToPulseLenght : UINT
+VAR_INPUT
+	fJoystickNormalized : LREAL; // Signal from -1 to 1
+	fEndPulseLengthPositive : LREAL; // Maximum pulse lenght for positive speed.
+	fStartPulseLengthPositive : LREAL; // Minimum pulse lenght needed for starting movement in positive direction.
+	fStartPulseLengthNegative : LREAL; // Pulse lenght needed for starting movement in positive direction.
+	fEndPulseLengthNegative : LREAL; // Pulse lenght at maximum negative velocity.
+END_VAR
+VAR
+	fservoPulseLenght : LREAL;
+	fJoystickMultiplied : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fJoystickMultiplied := (fEndPulseLengthPositive - fEndPulseLengthNegative)/2*fJoystickNormalized;
+
+
+IF fJoystickNormalized > 0 THEN
+	//Positive velocity
+	fservoPulseLenght := fStartPulseLengthPositive + fJoystickMultiplied;
+ELSIF fJoystickNormalized < 0 THEN
+	// Negative velocity
+	fservoPulseLenght := fStartPulseLengthNegative + fJoystickMultiplied;
+ELSE
+	//Idle
+	fservoPulseLenght := (fStartPulseLengthNegative + fStartPulseLengthPositive)/2; 
+END_IF
+
+
+
+NormToPulseLenght := LREAL_TO_UINT(fservoPulseLenght);
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

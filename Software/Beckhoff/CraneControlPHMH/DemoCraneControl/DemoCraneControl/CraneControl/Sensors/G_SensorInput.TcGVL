@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_SensorInput" Id="{eaec8836-4265-4e28-b2a0-04d44cc088be}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fEncoder1Rad AT %I* : REAL;
+	fEncoder2Rad AT %I* : REAL;
+	fEncoder3Rad AT %I* : REAL;
+	fTelescopeDistance_mm AT %I* : REAL;
+	fXRotDeg AT %I* : REAL;
+	fYRotDeg AT %I* : REAL;
+	bSensorDataLost : BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

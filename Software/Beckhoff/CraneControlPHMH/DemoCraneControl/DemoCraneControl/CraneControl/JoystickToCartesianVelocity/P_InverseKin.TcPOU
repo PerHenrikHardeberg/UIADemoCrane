@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_InverseKin" Id="{470a3f35-fb40-4260-ac8c-82f924797342}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_InverseKin
+VAR
+		//fbInvVelKinematics : FB_InvVelKinematics;
+		//fbInvPsudo : FB_IverseVelKinPsudo;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+
+
+
+
+
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

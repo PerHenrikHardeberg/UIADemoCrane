@@ -1,0 +1,126 @@
+
+Easy Configurator, configuration engine  V_3_3 
+
+log created on Mon Mar 18 15:00:31 2024
+
+Analyzing the project file
+
+Easy Configurator project INPUT_SLAVE.prj
+
+OUTPUTS_TAG
+INPUTS_TAG
+Line 5 --- encoder1Rad             float
+Line 6 --- encoder2Rad             float
+Line 7 --- encoder3Rad             float
+Line 8 --- TelescopeDistance_mm    float
+Line 9 --- xRotDeg                 float
+Line 10 --- yRotDeg                 float
+Line 11 --- mpuCalibrated           uint8_t
+INFO_TAG
+0x0000079A
+AB&amp;T
+0xDEADBEEF
+0x00000001
+INPUT_SLAVE
+INPUT_SLAVE
+END_TAG
+
+The INPUT_SLAVE.prj configuration file is correct
+
+ByteNumOut 0
+ByteNumIn  25
+PdoNumOut  0
+PdoNumIn   7
+
+Creating the INPUT_SLAVE.xml file
+
+PROJECT_TAG   INPUT_SLAVE.prj
+VENDOID_TAG   0000079A
+VEN_NAM_TAG   AB&amp;T
+PRO_COD_TAG   DEADBEEF
+REVISIO_TAG   00000001
+DEV_NAM_TAG   INPUT_SLAVE
+DEV_NAM_TAG   INPUT_SLAVE
+
+FIRST_TAG
+
+Input entries
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>1</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>encoder1Rad</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>2</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>encoder2Rad</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>3</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>encoder3Rad</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>4</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>TelescopeDistance_mm</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>5</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>xRotDeg</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>6</SubIndex>
+            <BitLen>32</BitLen>
+            <Name>yRotDeg</Name>
+            <DataType>REAL</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6</Index>
+            <SubIndex>7</SubIndex>
+            <BitLen>8</BitLen>
+            <Name>mpuCalibrated</Name>
+            <DataType>USINT</DataType>
+          </Entry>
+
+LAST_TAG
+
+The INPUT_SLAVE.xml file has been created
+
+Creating the INPUT_SLAVE.h file
+
+#define CUST_BYTE_NUM_OUT	0
+#define CUST_BYTE_NUM_IN	25
+#define TOT_BYTE_NUM_ROUND_OUT	0
+#define TOT_BYTE_NUM_ROUND_IN	28
+
+
+Output entries
+
+Input entries
+		float       encoder1Rad;
+		float       encoder2Rad;
+		float       encoder3Rad;
+		float       TelescopeDistance_mm;
+		float       xRotDeg;
+		float       yRotDeg;
+		uint8_t     mpuCalibrated;
+
+The INPUT_SLAVE.h file has been created
+
+Creating the INPUT_SLAVE.bin file
+
+
+The INPUT_SLAVE.bin file has been created

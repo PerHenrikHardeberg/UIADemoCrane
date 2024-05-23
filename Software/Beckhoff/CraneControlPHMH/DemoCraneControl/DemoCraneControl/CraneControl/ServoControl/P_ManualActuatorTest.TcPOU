@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_ManualActuatorTest" Id="{670b6120-01e1-4a79-9e1d-857b254e131f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_ManualActuatorTest
+VAR
+	fbPathGenerator: FB_PathGenerator;
+	Q1: BOOL;
+	t: INT;
+	ElapsedTime : LREAL;
+	sinus :  LREAL;
+	nsinus : UINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// This program is used only to make results for the manual controller. 
+//Actuating each joint with sinusoidal wave and check the sensor
+
+
+fbPathGenerator(bStart := G_Servo.bStartSinus, 
+				TIN := T#15S , 
+				Qout =>Q1, 
+				t => ElapsedTime);
+sinus := 70*SIN(ElapsedTime*2/2);
+nsinus :=  LREAL_TO_UINT(sinus);
+
+G_Servo.nServoPulseLenght1 := 350 ;// + sinus q1; 
+G_Servo.nServoPulseLenght2 := 350;/// + sinus q3;			
+G_Servo.nServoPulseLenght3 := 350; // Rotator
+G_Servo.nServoPulseLenght4 := 350 + nsinus;// + nsinus;		
+G_Servo.nServoPulseLenght6 := 350;
+
+// Grasper
+G_Servo.nServoPulseLenght5 := ButtonControlPulseLenght(fJoystickButtonFront := G_Buttons.bJoystickRightFrontEnable,
+														fJoystickButtonBack := G_Buttons.bJoystickRightEnable,
+															fNeutralPosition := 335);								
+								
+//Telescope using button					
+
+														
+
+
+				
+(*
+
+G_Servo.nServoPulseLenght6 := ButtonControlPulseLenght(fJoystickButtonFront := G_Buttons.bJoystickLeftEnable,
+														fJoystickButtonBack := G_Buttons.bJoystickLeftFrontEnable,
+														fNeutralPosition := 340);	
+
+G_Servo.nServoPulseLenght1 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickLeftNormalizedX,
+								fEndPulseLengthPositive := 390, fStartPulseLengthPositive := 368, fStartPulseLengthNegative := 333, fEndPulseLengthNegative := 310);
+
+G_Servo.nServoPulseLenght2 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickLeftNormalizedY,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);								
+
+G_Servo.nServoPulseLenght3 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickRightNormalizedX,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);								
+
+G_Servo.nServoPulseLenght4 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickRightNormalizedY,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);									
+
+								
+
+														
+														*)]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

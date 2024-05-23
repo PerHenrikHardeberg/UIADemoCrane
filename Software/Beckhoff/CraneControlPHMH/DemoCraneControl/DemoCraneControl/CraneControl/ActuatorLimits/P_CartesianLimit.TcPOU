@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_CartesianLimit" Id="{3eeae3de-7fa0-4dcd-9880-1a27a2ae931a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_CartesianLimit
+VAR
+	fbXLIMIT : FB_CartesianVelLimit;
+	fbYLIMIT : FB_CartesianVelLimit;
+	fbZLIMIT : FB_CartesianVelLimit;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbXLIMIT(axisVelocityIn := G_InverseKinematics.fvXref,
+							axisPosition := G_Toolpoint.fX,
+							axisMinPosition := G_ActuatorLimits.fXMin,
+							axisMaxPosition := G_ActuatorLimits.fXMax,
+							axisVelocityOut => G_InverseKinematics.fvXref);
+
+
+fbXLIMIT(axisVelocityIn := G_InverseKinematics.fvYref,
+							axisPosition := G_Toolpoint.fY,
+							axisMinPosition := G_ActuatorLimits.fYMin,
+							axisMaxPosition := G_ActuatorLimits.fYMax,
+							axisVelocityOut => G_InverseKinematics.fvYref);
+
+fbXLIMIT(axisVelocityIn := G_InverseKinematics.fvZref,
+							axisPosition := G_Toolpoint.fZ,
+							axisMinPosition := G_ActuatorLimits.fZMin,
+							axisMaxPosition := G_ActuatorLimits.fZMax,
+							axisVelocityOut => G_InverseKinematics.fvZref);
+					]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

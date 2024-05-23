@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Get3r" Id="{014f7ee5-08be-4c74-8a29-ad835b68f5a7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Get3r
+VAR_INPUT
+    xToolpointCraneFrame: LREAL; //m
+    yToolpointCraneFrame: LREAL; //m
+    zToolpointCraneFrame: LREAL; //m
+END_VAR
+VAR_OUTPUT
+    r3x: LREAL; //m
+    r3y: LREAL; //m
+    r3z: LREAL; //m
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* Outport: '<Root>/r3x' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function1' *)
+(* CraneFrame toolpoint *)
+(* MATLAB Function 'MATLAB Function1': '<S1>:1' *)
+(* '<S1>:1:4' r1a = [xToolpointCraneFrame; *)
+(* '<S1>:1:5'    yToolpointCraneFrame ; *)
+(* '<S1>:1:6'     zToolpointCraneFrame]; *)
+(* Vector from tippingpoint to crane *)
+(* '<S1>:1:9' r2a = [-37;%mm *)
+(* '<S1>:1:10'     0; *)
+(* '<S1>:1:11'     10]; *)
+(* mm *)
+(* mm *)
+(* '<S1>:1:13' r3 = r1a + r2a; *)
+(* '<S1>:1:14' r3x = r3(1); *)
+(* '<S1>:1:15' r3y = r3(2); *)
+(* '<S1>:1:16' r3z = r3(3); *)
+r3x := xToolpointCraneFrame -0.037;
+(* Outport: '<Root>/r3y' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function1' *)
+r3y := yToolpointCraneFrame;
+(* Outport: '<Root>/r3z' incorporates:
+ *  MATLAB Function: '<Root>/MATLAB Function1' *)
+r3z := zToolpointCraneFrame + 0.013;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

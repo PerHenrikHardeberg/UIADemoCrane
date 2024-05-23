@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="xscal_fiz1t4" Id="{c45a6594-dfe4-4d47-b5fb-27edf7a076cc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK xscal_fiz1t4
+VAR_INPUT
+    a: LREAL;
+    ix0: DINT;
+END_VAR
+VAR_IN_OUT
+    x: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR_TEMP
+    k: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[k := ix0;
+WHILE k <= (ix0 + 5) DO
+    x[k - 1] := x[k - 1] * a;
+    k := k + 1;
+END_WHILE;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

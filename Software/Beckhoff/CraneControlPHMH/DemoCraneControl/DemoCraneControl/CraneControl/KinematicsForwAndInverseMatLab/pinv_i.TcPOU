@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="pinv_i" Id="{f411707a-6b4a-43de-876f-b59af11af99e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK pinv_i
+VAR_INPUT
+    A: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR_OUTPUT
+    X: ARRAY [0..35] OF LREAL;
+END_VAR
+VAR
+    i0_svd_e: svd_e;
+END_VAR
+VAR_TEMP
+    V: ARRAY [0..35] OF LREAL;
+    b_r: DINT;
+    vcol: DINT;
+    U: ARRAY [0..35] OF LREAL;
+    b_s: ARRAY [0..5] OF LREAL;
+    tol: LREAL;
+    j: DINT;
+    ar: DINT;
+    ia: DINT;
+    b: DINT;
+    ib: DINT;
+    b_ic: DINT;
+    exitg1: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[b_r := -1;
+FOR vcol := 0 TO 35 DO 
+    X[vcol] := 0.0;
+END_FOR;
+i0_svd_e(A := A);
+U := i0_svd_e.U;
+b_s := i0_svd_e.b_s;
+V := i0_svd_e.V;
+tol := 6.0 * eps(x := b_s[0]);
+vcol := 0;
+REPEAT 
+    exitg1 := 0;
+    IF vcol < 6 THEN 
+        IF b_s[vcol] <= tol THEN 
+            exitg1 := 1;
+        ELSE 
+            b_r := b_r + 1;
+            vcol := vcol + 1;
+        END_IF;
+    ELSE 
+        exitg1 := 1;
+    END_IF;
+UNTIL NOT(exitg1 = 0)
+END_REPEAT;
+IF (b_r + 1) > 0 THEN 
+    vcol := 0;
+    j := 0;
+    WHILE j <= b_r DO
+        tol := 1.0 / b_s[j];
+        ar := vcol;
+        WHILE (ar + 1) <= (vcol + 6) DO
+            V[ar] := tol * V[ar];
+            ar := ar + 1;
+        END_WHILE;
+        vcol := vcol + 6;
+        j := j + 1;
+    END_WHILE;
+    vcol := 0;
+    FOR j := 0 TO 31 BY 6 DO 
+        ar := j;
+        WHILE (ar + 1) <= (j + 6) DO
+            X[ar] := 0.0;
+            ar := ar + 1;
+        END_WHILE;
+    END_FOR;
+    FOR j := 0 TO 31 BY 6 DO 
+        ar := -1;
+        vcol := vcol + 1;
+        b := (6 * b_r) + vcol;
+        ib := vcol;
+        WHILE ib <= b DO
+            ia := ar;
+            b_ic := j;
+            WHILE (b_ic + 1) <= (j + 6) DO
+                ia := ia + 1;
+                X[b_ic] := (U[ib - 1] * V[ia]) + X[b_ic];
+                b_ic := b_ic + 1;
+            END_WHILE;
+            ar := ar + 6;
+            ib := ib + 6;
+        END_WHILE;
+    END_FOR;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MatrixLog3" Id="{4fcb772c-203c-40c4-9b88-8fadfc86b30b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK MatrixLog3
+VAR_INPUT
+    b_R: ARRAY [0..8] OF LREAL;
+END_VAR
+VAR_OUTPUT
+    so3mat: ARRAY [0..8] OF LREAL;
+END_VAR
+VAR_TEMP
+    acosinput: LREAL;
+    theta: LREAL;
+    t: LREAL;
+    i: DINT;
+    b_idx_0: LREAL;
+    b_idx_1: LREAL;
+    so3mat_tmp: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* 'MatrixLog3:18' acosinput = (trace(R) - 1) / 2; *)
+acosinput := (((b_R[0] + b_R[4]) + b_R[8]) - 1.0) / 2.0;
+(* 'MatrixLog3:19' if acosinput >= 1 *)
+IF acosinput >= 1.0 THEN 
+    (* 'MatrixLog3:20' so3mat = zeros(3); *)
+    FOR i := 0 TO 8 DO 
+        so3mat[i] := 0.0;
+    END_FOR;
+ELSIF acosinput <= -1.0 THEN 
+    (* 'MatrixLog3:21' elseif acosinput <= -1 *)
+    (* 'MatrixLog3:22' if ~NearZero(1 + R(3, 3)) *)
+    (* *** BASIC HELPER FUNCTIONS *** *)
+    (* Takes a scalar. *)
+    (* Checks if the scalar is small enough to be neglected. *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* near = -1e-7; *)
+    (* judge = NearZero(near) *)
+    
+    (* Output: *)
+    (* judge = *)
+    (* 1 *)
+    (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+    IF ABS(b_R[8] + 1.0) >= 1.0E-6 THEN 
+        (* 'MatrixLog3:23' omg = (1 / sqrt(2 * (1 + R(3, 3)))) ... *)
+        (* 'MatrixLog3:24'               * [R(1, 3); R(2, 3); 1 + R(3, 3)]; *)
+        t := 1.0 / SQRT((b_R[8] + 1.0) * 2.0);
+        b_idx_0 := t * b_R[6];
+        b_idx_1 := t * b_R[7];
+        t := (b_R[8] + 1.0) * t;
+    ELSE 
+        (* *** BASIC HELPER FUNCTIONS *** *)
+        (* Takes a scalar. *)
+        (* Checks if the scalar is small enough to be neglected. *)
+        (* Example Input: *)
+        
+        (* clear; clc; *)
+        (* near = -1e-7; *)
+        (* judge = NearZero(near) *)
+        
+        (* Output: *)
+        (* judge = *)
+        (* 1 *)
+        (* 'NearZero:15' judge = norm(near) < 1e-6; *)
+        IF ABS(b_R[4] + 1.0) >= 1.0E-6 THEN 
+            (* 'MatrixLog3:25' elseif ~NearZero(1 + R(2, 2)) *)
+            (* 'MatrixLog3:26' omg = (1 / sqrt(2 * (1 + R(2, 2)))) ... *)
+            (* 'MatrixLog3:27'               * [R(1, 2); 1 + R(2, 2); R(3, 2)]; *)
+            t := 1.0 / SQRT((b_R[4] + 1.0) * 2.0);
+            b_idx_0 := t * b_R[3];
+            b_idx_1 := (b_R[4] + 1.0) * t;
+            t := t * b_R[5];
+        ELSE 
+            (* 'MatrixLog3:28' else *)
+            (* 'MatrixLog3:29' omg = (1 / sqrt(2 * (1 + R(1, 1)))) ... *)
+            (* 'MatrixLog3:30'               * [1 + R(1, 1); R(2, 1); R(3, 1)]; *)
+            t := 1.0 / SQRT((b_R[0] + 1.0) * 2.0);
+            b_idx_0 := (b_R[0] + 1.0) * t;
+            b_idx_1 := t * b_R[1];
+            t := t * b_R[2];
+        END_IF;
+    END_IF;
+    (* 'MatrixLog3:32' so3mat = VecToso3(pi * omg); *)
+    b_idx_0 := 3.1415926535897931 * b_idx_0;
+    b_idx_1 := 3.1415926535897931 * b_idx_1;
+    t := 3.1415926535897931 * t;
+    (* *** CHAPTER 3: RIGID-BODY MOTIONS *** *)
+    (* Takes a 3-vector (angular velocity). *)
+    (* Returns the skew symmetric matrix in so(3). *)
+    (* Example Input: *)
+    
+    (* clear; clc; *)
+    (* omg = [1; 2; 3]; *)
+    (* so3mat = VecToso3(omg) *)
+    
+    (* Output: *)
+    (* so3mat = *)
+    (* 0    -3     2 *)
+    (* 3     0    -1 *)
+    (* -2     1     0 *)
+    (* 'VecToso3:17' so3mat = [0, -omg(3), omg(2); omg(3), 0, -omg(1); -omg(2), omg(1), 0]; *)
+    so3mat[0] := 0.0;
+    so3mat[3] :=  -t;
+    so3mat[6] := b_idx_1;
+    so3mat[1] := t;
+    so3mat[4] := 0.0;
+    so3mat[7] :=  -b_idx_0;
+    so3mat[2] :=  -b_idx_1;
+    so3mat[5] := b_idx_0;
+    so3mat[8] := 0.0;
+ELSE 
+    (* 'MatrixLog3:33' else *)
+    (* 'MatrixLog3:34' theta = acos(acosinput); *)
+    theta := ACOS(acosinput);
+    (* 'MatrixLog3:35' so3mat = theta * (1 / (2 * sin(theta))) * (R - R'); *)
+    t := (1.0 / (2.0 * SIN(theta))) * theta;
+    FOR i := 0 TO 2 DO 
+        so3mat[3 * i] := (b_R[3 * i] - b_R[i]) * t;
+        so3mat_tmp := (3 * i) + 1;
+        so3mat[so3mat_tmp] := (b_R[so3mat_tmp] - b_R[i + 3]) * t;
+        so3mat_tmp := (3 * i) + 2;
+        so3mat[so3mat_tmp] := (b_R[so3mat_tmp] - b_R[i + 6]) * t;
+    END_FOR;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_CartesianVelFromJoystick" Id="{3635fd67-c0b2-4766-ac39-afb4a91631f3}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_CartesianVelFromJoystick
+VAR
+
+	fbJoystickToCartesianVelocity1 : FB_JoystickToCartesianVelocity;
+	fbJoystickToCartesianVelocity2 : FB_JoystickToCartesianVelocity;
+	fbJoystickToCartesianVelocity3 : FB_JoystickToCartesianVelocity;
+END_VAR
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[						
+// Mapping joistick to cartesian linear velocity
+fbJoystickToCartesianVelocity1(fNormalizezJoistick := G_Joystick.fJoystickLeftNormalizedY,
+								fScalingFactor := 0.02, //Corresponding to linear velocity toolpoint in m/s
+								fAxisVelocity => G_InverseKinematics.fvXref);
+								
+fbJoystickToCartesianVelocity2(fNormalizezJoistick := G_Joystick.fJoystickLeftNormalizedX,
+								fScalingFactor := 0.02,
+								fAxisVelocity => G_InverseKinematics.fvYref);
+
+fbJoystickToCartesianVelocity3(fNormalizezJoistick := -G_Joystick.fJoystickRightNormalizedY, // Direction on the joystick inverted
+								fScalingFactor := 0.02,
+								fAxisVelocity => G_InverseKinematics.fvZref);				
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

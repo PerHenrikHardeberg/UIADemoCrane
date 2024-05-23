@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="eye" Id="{ed62f816-13c3-4ac9-9b30-2738105912f0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK eye
+VAR_OUTPUT
+    I: ARRAY [0..8] OF LREAL;
+END_VAR
+VAR_TEMP
+    b_i: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR b_i := 0 TO 8 DO 
+    I[b_i] := 0.0;
+END_FOR;
+I[0] := 1.0;
+I[4] := 1.0;
+I[8] := 1.0;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

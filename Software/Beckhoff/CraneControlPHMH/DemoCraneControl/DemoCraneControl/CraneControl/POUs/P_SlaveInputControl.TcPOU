@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_SlaveInputControl" Id="{484f9364-46d2-4430-a336-f7521af6b9ce}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_SlaveInputControl
+VAR
+	tempEncoder1 : LREAL := 0;
+	tempEncoder11 : LREAL := 1;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

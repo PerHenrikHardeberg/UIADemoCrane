@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_PathGenerator" Id="{c435b4ab-f20b-4b44-b229-cbaec632384b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PathGenerator
+VAR_INPUT
+	bStart : BOOL;
+	TIN : TIME;
+END_VAR
+VAR_OUTPUT
+	Qout : BOOL; // Finished
+	t : LREAL;
+END_VAR
+VAR
+	tTimer : TON;
+	tElappsed : TIME;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[tTimer(IN := bStart, 
+		PT := TIN,
+		Q => Qout,
+		ET => tElappsed);
+
+t := TIME_TO_LREAL(tElappsed)/1000; // Time to S
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

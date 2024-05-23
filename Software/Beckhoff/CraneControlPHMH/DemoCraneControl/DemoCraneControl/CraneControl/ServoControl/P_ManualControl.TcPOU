@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_ManualControl" Id="{ff42a407-caa4-4a54-9b96-123c3e08798e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_ManualControl
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+G_Servo.nServoPulseLenght1 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickLeftNormalizedX,
+								fEndPulseLengthPositive := 390, fStartPulseLengthPositive := 368, fStartPulseLengthNegative := 333, fEndPulseLengthNegative := 310);
+
+G_Servo.nServoPulseLenght2 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickLeftNormalizedY,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);								
+
+G_Servo.nServoPulseLenght3 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickRightNormalizedX,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 370, fStartPulseLengthNegative := 350, fEndPulseLengthNegative := 290);								
+
+G_Servo.nServoPulseLenght4 := NormToPulseLenght(fJoyStickNormalized := G_Joystick.fJoystickRightNormalizedY,
+								fEndPulseLengthPositive := 410, fStartPulseLengthPositive := 360, fStartPulseLengthNegative := 340, fEndPulseLengthNegative := 290);									
+
+								
+// Grasper
+G_Servo.nServoPulseLenght5 := ButtonControlPulseLenght(fJoystickButtonFront := G_Buttons.bJoystickRightFrontEnable,
+														fJoystickButtonBack := G_Buttons.bJoystickRightEnable,
+															fNeutralPosition := 325);								
+								
+//Telescope using button					
+G_Servo.nServoPulseLenght6 := ButtonControlPulseLenght(fJoystickButtonFront := G_Buttons.bJoystickLeftEnable,
+														fJoystickButtonBack := G_Buttons.bJoystickLeftFrontEnable,
+														fNeutralPosition := 340);	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

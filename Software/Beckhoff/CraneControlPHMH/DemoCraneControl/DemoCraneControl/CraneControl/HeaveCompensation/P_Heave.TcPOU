@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_Heave" Id="{d05fcf24-6752-4dae-9b68-d1d837dabae5}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_Heave
+VAR
+	fbGet3r : FB_Get3r;
+	fbGenr1b : FB_Genr1b;
+	fbToolpointPositionIntegrator2 : FB_ToolpointPositionIntegrator;
+	thethaThreshold : LREAL := 0.5; //Degrees
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//  Remove offset from tipping angle
+G_Heave.fTheta := G_SensorInput.fYRotDeg - G_Heave.fThetaStart;
+
+// Tune threshold
+thethaThreshold := 0.3;
+
+
+//Set angle threshold due to physical limitations
+IF G_Heave.fTheta < 0 THEN
+	G_Heave.fTheta := 0;
+ELSIF G_Heave.fTheta > 13 THEN
+	G_Heave.fTheta := 13; //Degrees
+END_IF
+
+
+	
+
+
+// Check if tilting is active:
+IF G_Heave.fTheta > thethaThreshold AND G_Heave.fTheta < 13 THEN
+	//CODE FOR HEAVE COMPENSATION
+//integrating r3 to include tolpoint velocity. r3 frame coordinate is paralell to crane coordinate with theta = 0 
+fbToolpointPositionIntegrator2(fXref :=G_Heave.r3x,
+									fYref :=G_Heave.r3y,
+									fZref := G_Heave.r3z,
+								fXrefOut => G_Heave.r3x,
+								fYrefOut => G_Heave.r3y,
+								fZrefOut => G_Heave.r3z);
+
+
+// Generate vector from crane base to toolpoint in crane coordinate, based on the r3 vector in crane coordinate
+fbGenr1b(thetaDeg := G_Heave.fTheta,
+			r3x := G_Heave.r3x,
+			r3y := G_Heave.r3y,
+			r3z := G_Heave.r3z,
+			r1bx => G_Heave.r1bxCrane,
+			r1by => G_Heave.r1byCrane,
+			r1bz => G_Heave.r1bzCrane);
+
+// Writing the desired position coordinate in crane frame
+G_Toolpoint.fXref := G_Heave.r1bxCrane;
+G_Toolpoint.fYref := G_Heave.r1byCrane;
+G_Toolpoint.fZref := G_Heave.r1bzCrane;
+
+
+ELSE
+	//CODE FOR SETTING r3 when angle is approx 0
+	fbGet3r(xToolpointCraneFrame := G_Toolpoint.fXref,  // Use ref here so the r3 vector gets updated in cartesian control aswell
+			yToolpointCraneFrame := G_Toolpoint.fYref,
+			zToolpointCraneFrame := G_Toolpoint.fZref,
+			r3x => G_Heave.r3x,
+			r3y => G_Heave.r3y,
+			r3z => G_Heave.r3z);
+			
+	P_VelToPos();			
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

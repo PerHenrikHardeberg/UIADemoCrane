@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_SensorsScaled" Id="{fb7c7de4-6218-46cb-848a-b785536b5d86}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	q1: REAL;
+	q2  : REAL;
+	q3  : REAL;
+	q4 : REAL;
+	q1Dot: REAL;
+	q2Dot  : REAL;
+	q3Dot  : REAL;
+	q4Dot : REAL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

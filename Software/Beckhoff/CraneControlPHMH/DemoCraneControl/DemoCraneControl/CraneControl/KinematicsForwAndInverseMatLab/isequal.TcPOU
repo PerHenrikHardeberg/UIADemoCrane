@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="isequal" Id="{16472d12-d37e-4a98-a7e2-6a7539baccc9}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION isequal : BOOL
+VAR_INPUT
+    varargin_1: ARRAY [0..8] OF LREAL;
+    varargin_2: ARRAY [0..8] OF LREAL;
+END_VAR
+VAR
+    b_b_p: BOOL;
+    k: DINT;
+    exitg1: DINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[isequal := FALSE;
+b_b_p := TRUE;
+k := 0;
+REPEAT 
+    exitg1 := 0;
+    IF k < 9 THEN 
+        IF varargin_1[k] <> varargin_2[k] THEN 
+            b_b_p := FALSE;
+            exitg1 := 1;
+        ELSE 
+            k := k + 1;
+        END_IF;
+    ELSE 
+        exitg1 := 1;
+    END_IF;
+UNTIL NOT(exitg1 = 0)
+END_REPEAT;
+IF b_b_p THEN 
+    isequal := TRUE;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

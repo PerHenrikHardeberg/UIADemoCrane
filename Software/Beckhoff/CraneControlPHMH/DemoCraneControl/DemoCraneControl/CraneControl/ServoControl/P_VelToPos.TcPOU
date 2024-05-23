@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_VelToPos" Id="{de171902-8364-435f-a35a-74c7fa57f6bc}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_VelToPos
+VAR
+		fbToolpointPositionIntegrator : FB_ToolpointPositionIntegrator;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbToolpointPositionIntegrator(fXref := G_Toolpoint.fXref,
+								fYref := G_Toolpoint.fYref,
+								fZref := G_Toolpoint.fZref,
+								fXrefOut => G_Toolpoint.fXref,
+								fYrefOut => G_Toolpoint.fYref,
+								fZrefOut => G_Toolpoint.fZref);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

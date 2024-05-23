@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_NormalizeJointVel" Id="{9d2f287e-2610-4fe5-b68c-866cfdd65833}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_NormalizeJointVel
+VAR
+	fbActuatorVelToNormalized4 : FB_ActuatorVelFeedForward;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// Going from joint velocity to normalized signal inn PID
+fbActuatorVelToNormalized4(fActuatorVelocity := G_InverseKinematics.fq4Dotref,
+							fMaxActuatorVelocity := 0.030, //m/s
+							fVelocityFeedForward => G_Servo.fNormalizedActuatorVelFeedForward_q4Dot);
+
+
+						]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

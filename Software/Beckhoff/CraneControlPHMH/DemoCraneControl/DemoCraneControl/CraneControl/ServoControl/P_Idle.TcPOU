@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_Idle" Id="{2d8e90b7-eb50-4a68-8041-2c68533a806c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_Idle
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[G_Servo.nServoPulseLenght1 := 350;
+G_Servo.nServoPulseLenght2 := 350;
+G_Servo.nServoPulseLenght3 := 350;
+G_Servo.nServoPulseLenght4 := 350;
+G_Servo.nServoPulseLenght5 := 335;
+G_Servo.nServoPulseLenght6 := 340;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

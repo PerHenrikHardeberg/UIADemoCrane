@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_PathGeneration_3" Id="{0b4db845-d880-48e3-a56e-008e92d85d8f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_PathGeneration_3
+VAR
+	fbPathGenerator : FB_PathGenerator;
+	Q1 : BOOL;
+	ElapsedTime : LREAL;
+	TimeX : LREAL := 2.5;
+	TimeY : LREAL := 1.2;
+	TimeZ : LREAL := 1.2;
+	TimeEachSequence: INT;
+	cartesianVelocity : LREAL;
+	timescaling: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// FOR  TELESCOPE TUNING
+timescaling := 3;
+cartesianVelocity := 0.050/timescaling; // OPEN LOOP: Very much difference between 40 and 50 m/s
+
+fbPathGenerator(bStart := G_Path.bStartPath, 
+				TIN := T#150S , 
+				Qout =>Q1, 
+				t => ElapsedTime);
+
+
+IF ElapsedTime>= 0*timescaling AND ElapsedTime< 2*timescaling AND G_Path.bStartPath THEN 
+	G_Path.bPathRunning := TRUE;
+	G_Path.bPathFinnish := FALSE;
+	G_InverseKinematics.fvXref := cartesianVelocity; //mm/S
+	G_InverseKinematics.fvYref := 0; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+ELSIF ElapsedTime = 2*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSIF ElapsedTime> 2*timescaling AND ElapsedTime < 4*timescaling THEN
+	G_InverseKinematics.fvXref := 0; //mm/S
+	G_InverseKinematics.fvYref := cartesianVelocity; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+ELSIF ElapsedTime = 4*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSIF ElapsedTime>= 4*timescaling AND ElapsedTime < 6*timescaling THEN
+	G_InverseKinematics.fvXref := 0; //mm/S
+	G_InverseKinematics.fvYref := 0; //mm/S
+	G_InverseKinematics.fvZref := cartesianVelocity; //mm/S
+ELSIF ElapsedTime = 6*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSIF ElapsedTime>= 6*timescaling AND ElapsedTime < 8*timescaling THEN
+	G_InverseKinematics.fvXref := cartesianVelocity; //mm/S
+	G_InverseKinematics.fvYref := -cartesianVelocity; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+ELSIF ElapsedTime = 8*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSIF ElapsedTime>= 8*timescaling AND ElapsedTime < 13*timescaling THEN
+	G_InverseKinematics.fvXref := 0; //mm/S
+	G_InverseKinematics.fvYref := cartesianVelocity; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+ELSIF ElapsedTime = 13*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSIF ElapsedTime>= 13*timescaling AND ElapsedTime < 17*timescaling THEN
+	G_InverseKinematics.fvXref := -cartesianVelocity; //mm/S
+	G_InverseKinematics.fvYref := -cartesianVelocity; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+ELSIF ElapsedTime = 17*timescaling THEN
+	G_Toolpoint.fXref := G_Toolpoint.fX; // RESET PATH TO CURRENT PATH IN TRANSITIONS
+	G_Toolpoint.fYref := G_Toolpoint.fY;
+	G_Toolpoint.fZref := G_Toolpoint.fZ;
+ELSE
+	G_Path.bPathRunning := FALSE;
+	G_Path.bPathFinnish := TRUE;
+	G_Path.bStartPath := FALSE;
+	ElapsedTime := 0;
+	G_InverseKinematics.fvXref := 0; //mm/S
+	G_InverseKinematics.fvYref := 0; //mm/S
+	G_InverseKinematics.fvZref := 0; //mm/S
+END_IF
+
+
+
+(*
+CASE CaseInt OF
+
+1:  
+fbPathGenerator(bStart := G_Path.bStartPath,
+TIN := T#2S, 
+Coordinate => G_InverseVelocityKinematics.fvXref, 
+Qout => Q1);
+IF Q1 THEN
+	CaseInt:=2;
+END_IF
+
+
+2:     
+fbPathGenerator2(bStart := G_Path.bStartPath,
+TIN := T#2S, 
+Coordinate => G_InverseVelocityKinematics.fvYref, 
+Qout => Q2);
+IF Q2 THEN
+	CaseInt:=3;
+END_IF
+
+3:     
+fbPathGenerator3(bStart := G_Path.bStartPath,
+TIN := T#2S, 
+Coordinate => G_InverseVelocityKinematics.fvZref, 
+Qout => Q3);
+IF Q3 THEN
+	G_Path.bStartPath := FALSE;
+	CaseInt:=1;
+	Q1 := FALSE;
+	Q2 := FALSE;
+	Q3 := FALSE;
+END_IF
+
+END_CASE;
+
+*)
+
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

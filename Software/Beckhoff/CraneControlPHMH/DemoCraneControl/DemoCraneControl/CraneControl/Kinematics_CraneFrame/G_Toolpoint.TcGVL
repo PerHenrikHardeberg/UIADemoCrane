@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_Toolpoint" Id="{b5b2bcb7-ad92-4666-bf66-8c7384024a0c}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fX  : LREAL; //m
+	fY  : LREAL; //m
+	fZ  : LREAL; //m
+	fXref  : LREAL; // Toolpoint cartesian reference signal position controller
+	fYref  : LREAL;//m
+	fZref  : LREAL;//m
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

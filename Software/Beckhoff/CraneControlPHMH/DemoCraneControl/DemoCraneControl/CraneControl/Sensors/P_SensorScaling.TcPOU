@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="P_SensorScaling" Id="{a5ec724e-1719-4f1b-9727-6da0a0116a4d}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM P_SensorScaling
+VAR
+		fbEncoderval2Angleq3 : FB_Encoderval2Angle_q3;
+		fbDistSensorValue2Distance_q4 : FB_DistSensorValue2Distance_q4;
+
+	
+	// Temp variables for checking sensor comunication
+	tempTOF1: LREAL;
+	tempTOF11: LREAL;
+	tempCounter: DINT := 0;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbEncoderval2Angleq3(theta_i := G_SensorInput.fEncoder3Rad ,
+					q3 => G_SensorsScaled.q3);
+					
+					
+G_SensorsScaled.q1 := -G_SensorInput.fEncoder1Rad;
+G_SensorsScaled.q2 := -G_SensorInput.fEncoder2Rad;
+
+
+
+fbDistSensorValue2Distance_q4(fSensorValue := G_SensorInput.fTelescopeDistance_mm,
+							f_q4 => G_SensorsScaled.q4);								
+// TEMP FOR 3 DOF
+//G_SensorsScaled.q4 := 0;
+			
+
+/////////////////////////////////////////////////////////////////////////////
+// Check if sensors are comunicating and lighting RED LED communication lost	
+tempTOF1 := G_SensorInput.fTelescopeDistance_mm;
+IF tempTOF1 = tempTOF11 THEN
+	tempCounter := tempCounter +1;
+ELSE
+	tempCounter := 0;
+END_IF
+tempTOF11 := G_SensorInput.fTelescopeDistance_mm;
+
+IF tempCounter > 50 THEN
+	G_SensorInput.bSensorDataLost := TRUE;
+ELSE
+	G_SensorInput.bSensorDataLost := FALSE;
+END_IF
+//////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="G_Heave" Id="{7259ec0b-ea76-4854-b778-ea7093f62b5e}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	fThetaStart : LREAL; //Tipping angle in degrees read at with system at rest
+	fTheta : LREAL; //Tipping angle in degrees
+	r3x : LREAL; //Vector from tipping point to toolpoint ref in frame coordinate
+	r3y : LREAL; //Vector from tipping point to toolpoint ref in frame coordinate
+	r3z : LREAL; //Vector from tipping point to toolpoint ref in frame coordinate
+	r1bxCrane : LREAL; // Vector from crane base to toolpoint in Crane coordinates
+	r1byCrane : LREAL; // Vector from crane base to toolpoint in Crane coordinates
+	r1bzCrane : LREAL; // Vector from crane base to toolpoint in Crane coordinates
+	bHeaveEnable : BOOL;
+	bHeaveActive : BOOL := FALSE;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

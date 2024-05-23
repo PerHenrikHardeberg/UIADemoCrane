@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="xdotc_iq" Id="{0c7bc3ca-91cf-4047-afd3-251b6bbdbd67}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION xdotc_iq : LREAL
+VAR_INPUT
+    b_n: DINT;
+    x: ARRAY [0..35] OF LREAL;
+    ix0: DINT;
+    y: ARRAY [0..35] OF LREAL;
+    iy0: DINT;
+END_VAR
+VAR
+    ix: DINT;
+    iy: DINT;
+    k: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[xdotc_iq := 0.0;
+IF b_n >= 1 THEN 
+    ix := ix0;
+    iy := iy0;
+    k := 0;
+    WHILE k <= (b_n - 1) DO
+        xdotc_iq := (x[ix - 1] * y[iy - 1]) + xdotc_iq;
+        ix := ix + 1;
+        iy := iy + 1;
+        k := k + 1;
+    END_WHILE;
+END_IF;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,117 @@
+
+Easy Configurator, configuration engine  V_3_3 
+
+log created on Mon Mar 18 14:57:50 2024
+
+Analyzing the project file
+
+Easy Configurator project OUTPUT_SLAVE.prj
+
+OUTPUTS_TAG
+Line 4 --- ServoPulseLength1       uint16_t
+Line 5 --- ServoPulseLength2       uint16_t
+Line 6 --- ServoPulseLength3       uint16_t
+Line 7 --- ServoPulseLength4       uint16_t
+Line 8 --- ServoPulseLength5       uint16_t
+Line 9 --- ServoPulseLength6       uint16_t
+INPUTS_TAG
+INFO_TAG
+0x0000079A
+AB&amp;T
+0xDEADBEEF
+0x00000001
+OUTPUT_SLAVE
+OUTPUT_SLAVE
+END_TAG
+
+The OUTPUT_SLAVE.prj configuration file is correct
+
+ByteNumOut 12
+ByteNumIn  0
+PdoNumOut  6
+PdoNumIn   0
+
+Creating the OUTPUT_SLAVE.xml file
+
+PROJECT_TAG   OUTPUT_SLAVE.prj
+VENDOID_TAG   0000079A
+VEN_NAM_TAG   AB&amp;T
+PRO_COD_TAG   DEADBEEF
+REVISIO_TAG   00000001
+DEV_NAM_TAG   OUTPUT_SLAVE
+DEV_NAM_TAG   OUTPUT_SLAVE
+
+FIRST_TAG
+
+Output entries
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>1</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength1</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>2</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength2</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>3</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength3</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>4</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength4</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>5</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength5</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x5</Index>
+            <SubIndex>6</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>ServoPulseLength6</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+
+LAST_TAG
+
+The OUTPUT_SLAVE.xml file has been created
+
+Creating the OUTPUT_SLAVE.h file
+
+#define CUST_BYTE_NUM_OUT	12
+#define CUST_BYTE_NUM_IN	0
+#define TOT_BYTE_NUM_ROUND_OUT	12
+#define TOT_BYTE_NUM_ROUND_IN	0
+
+
+Output entries
+		uint16_t    ServoPulseLength1;
+		uint16_t    ServoPulseLength2;
+		uint16_t    ServoPulseLength3;
+		uint16_t    ServoPulseLength4;
+		uint16_t    ServoPulseLength5;
+		uint16_t    ServoPulseLength6;
+
+Input entries
+
+The OUTPUT_SLAVE.h file has been created
+
+Creating the OUTPUT_SLAVE.bin file
+
+
+The OUTPUT_SLAVE.bin file has been created
