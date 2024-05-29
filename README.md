@@ -16,3 +16,5 @@ Software (See seperate readme file in folder):
 
 CAD (See seperate readme file in folder): 
 - Solidworks CAD model for demo crane assembly
+
+SimulinkSimulation: Simulation of inverse kinematics with combined solution, removing actuator redundancy
