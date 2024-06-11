@@ -5,8 +5,7 @@ This repository is including the master thesis of Per Henrik Marie Hardeberg fro
 The repo is including:
 
 Report:
-- Complete report from master thesis (Demo Model start up guide in appendix of report) (Will be added after 
-censorship)
+- Complete report from master thesis (Demo Model start up guide in appendix of report)
 
 Software (See seperate readme file in folder):
 - Beckhoff Twincat 3 PLC program
